@@ -106,6 +106,26 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
         }
     }
 
+    protected static string GetUsername(ChatMessage msg)
+    {
+        return msg.Sender switch
+        {
+            ChatSender.AI => "AI",
+            ChatSender.User => msg.Username,
+            _ => string.Empty,
+        };
+    }
+
+    protected static string GetChatFooter(ChatMessage msg)
+    {
+        return msg.Sender switch
+        {
+            ChatSender.AI => $"{msg.SentTime.ToLongTimeString()}  |  Time taken: {msg.Duration}  |  Model: {msg.ModelId}",
+            ChatSender.User => msg.SentTime.ToLongTimeString(),
+            _ => string.Empty,
+        };
+    }
+
     protected static string GetCss(ChatSender sender) => sender switch
     {
         ChatSender.AI => "received",

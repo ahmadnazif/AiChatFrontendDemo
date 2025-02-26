@@ -38,16 +38,9 @@ else
             @foreach (var item in Chats)
             {
                 <div class="@GetCss(item.Sender)">
-                    <div class="user">@item.Username</div>
+                    <div class="user">@GetUsername(item)</div>
                     <div class="msg">@item.Message</div>
-                    @if (item.Sender == ChatSender.AI)
-                    {
-                        <font size="1">@item.SentTime.ToLongTimeString() | <strong>Time taken:</strong> @item.Duration | <strong>Model:</strong> @item.ModelId</font>
-                    }
-                    else
-                    {
-                        <font size="1">@item.SentTime.ToLongTimeString()</font>
-                    }
+                    <font size="1">@GetChatFooter(item)</font>
                 </div>
             }
             <hr />
