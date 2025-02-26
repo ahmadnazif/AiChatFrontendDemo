@@ -1,3 +1,4 @@
+global using AiChatFrontend.Models;
 using AiChatFrontend;
 using AiChatFrontend.Services;
 using Microsoft.AspNetCore.Components.Web;
