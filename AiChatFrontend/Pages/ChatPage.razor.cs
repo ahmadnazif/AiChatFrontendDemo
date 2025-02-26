@@ -72,7 +72,7 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
 
         Chats.Add(new()
         {
-            Sender = ChatSender.AI,
+            Sender = ChatSender.Assistant,
             Username = param.Username,
             ConnectionId = param.ConnectionId,
             Message = param.ResponseMessage,
@@ -110,8 +110,8 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
     {
         return msg.Sender switch
         {
-            ChatSender.AI => "AI",
             ChatSender.User => msg.Username,
+            ChatSender.Assistant => msg.Sender.ToString(),
             _ => string.Empty,
         };
     }
@@ -120,7 +120,7 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
     {
         return msg.Sender switch
         {
-            ChatSender.AI => $"{msg.SentTime.ToLongTimeString()}  |  Time taken: {msg.Duration}  |  Model: {msg.ModelId}",
+            ChatSender.Assistant => $"{msg.SentTime.ToLongTimeString()}  |  Time taken: {msg.Duration}  |  Model: {msg.ModelId}",
             ChatSender.User => msg.SentTime.ToLongTimeString(),
             _ => string.Empty,
         };
@@ -128,7 +128,7 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
 
     protected static string GetCss(ChatSender sender) => sender switch
     {
-        ChatSender.AI => "received",
+        ChatSender.Assistant => "received",
         ChatSender.User => "sent",
         _ => string.Empty,
     };

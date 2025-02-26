@@ -2,6 +2,6 @@
 
 public enum ChatSender
 {
-    AI,
-    User
+    User,
+    Assistant
 }
