@@ -53,9 +53,9 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger, Cac
 
     public async Task SendAsync(string message)
     {
-        ChatHubChatRequest req = new()
+        ChatHubOneChatRequest req = new()
         {
-             Message = message
+             Message = new(ChatSender.User, message)
         };
 
         try
