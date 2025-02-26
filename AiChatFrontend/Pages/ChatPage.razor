@@ -40,13 +40,20 @@ else
                 <div class="@GetCss(item.Sender)">
                     <div class="user">@item.Username</div>
                     <div class="msg">@item.Message</div>
-                    <font size="1">@item.SentTime.ToLongTimeString()</font>
+                    @if (item.Sender == ChatSender.AI)
+                    {
+                        <font size="1">@item.SentTime.ToLongTimeString() | <strong>Time taken:</strong> @item.Duration | <strong>Model:</strong> @item.ModelId</font>
+                    }
+                    else
+                    {
+                        <font size="1">@item.SentTime.ToLongTimeString()</font>
+                    }
                 </div>
             }
             <hr />
             <div class="input-group">
                 <textarea class="form-control" rows="2" style="resize:none" placeholder="Enter you message" @bind="@NewMessage"></textarea>
-                <button class="btn btn-sm btn-success" @onclick="async() => await SendAsync()"><span class="oi oi-location"></span> Send</button>
+                <button class="btn btn-sm btn-success" disabled="@IsWaitingResponse" @onclick="async() => await SendAsync()"><span class="oi oi-location"></span> Send</button>
             </div>
         </div>
     }

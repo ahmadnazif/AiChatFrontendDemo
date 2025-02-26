@@ -14,6 +14,7 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
     //[Inject] public CacheService Cache { get; set; }
     [Inject] public ApiClient Api { get; set; }
     protected bool IsChatting { get; set; } = false;
+    protected bool IsWaitingResponse { get; set; } = false;
     protected string Username { get; set; }
     protected UserSession UserSession { get; set; }
     protected string ConnectionId { get; set; }
@@ -62,6 +63,7 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
 
     private void OnMessageReceived(object sender, EventArgs.MessageReceivedEventArgs e)
     {
+        IsWaitingResponse = false;
         var param = e.Parameter;
 
         if (param == null)
@@ -74,7 +76,9 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
             ConnectionId = param.ConnectionId,
             IsMine = IsMine(param),
             Message = param.ResponseMessage,
-            SentTime = DateTime.Now
+            SentTime = DateTime.Now,
+            Duration = param.Duration.ToString(),
+            ModelId = param.ModelId
         });
 
         Logger.LogInformation($"[RECEIVED] {JsonSerializer.Serialize(param)}");
@@ -85,8 +89,6 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
     {
         if (IsChatting && !string.IsNullOrWhiteSpace(NewMessage))
         {
-            Logger.LogInformation($"[SENT] {UserSession.Username}: {NewMessage}");
-
             Chats.Add(new()
             {
                 Sender = ChatSender.User,
@@ -98,7 +100,10 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
             });
 
             await ChatClient.SendMessageAsync(NewMessage);
+            Logger.LogInformation($"[SENT] {UserSession.Username}: {NewMessage}");
+
             NewMessage = string.Empty;
+            IsWaitingResponse = true;
         }
     }
 
