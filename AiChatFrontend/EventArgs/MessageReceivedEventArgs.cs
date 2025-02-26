@@ -1,7 +1,7 @@
 ﻿namespace AiChatFrontend.EventArgs;
 
-public class MessageReceivedEventArgs(ChatHubChatResponse param) : System.EventArgs
+public class MessageReceivedEventArgs(OneChatResponse param) : System.EventArgs
 {
-    public ChatHubChatResponse Parameter { get; set; } = param;
+    public OneChatResponse Parameter { get; set; } = param;
 
 }

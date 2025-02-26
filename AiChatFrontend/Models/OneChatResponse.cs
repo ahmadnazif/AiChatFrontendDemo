@@ -2,7 +2,7 @@
 
 namespace AiChatFrontend.Models;
 
-public class ChatHubChatResponse
+public class OneChatResponse
 {
     public string? Username { get; set; }
     public string? ConnectionId { get; set; }

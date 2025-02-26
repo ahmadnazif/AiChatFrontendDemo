@@ -41,13 +41,13 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger, Cac
             return Task.CompletedTask;
         };
 
-        hubConnection.On<ChatHubChatResponse>("OnReceivedOne", parameter => OnMessageReceivedOne?.Invoke(this, new MessageReceivedEventArgs(parameter)));
+        hubConnection.On<OneChatResponse>("OnReceivedOne", parameter => OnMessageReceivedOne?.Invoke(this, new MessageReceivedEventArgs(parameter)));
 
         await hubConnection.StartAsync();
         IsConnected = true;
     }
 
-    private void HandleReceive(ChatHubChatResponse parameter) => OnMessageReceivedOne?.Invoke(this, new MessageReceivedEventArgs(parameter));
+    private void HandleReceive(OneChatResponse parameter) => OnMessageReceivedOne?.Invoke(this, new MessageReceivedEventArgs(parameter));
 
     public async Task SendOneAsync(string message)
     {
