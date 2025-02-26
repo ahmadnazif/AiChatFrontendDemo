@@ -11,6 +11,7 @@ var config = builder.Configuration;
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+builder.Services.AddSingleton<CacheService>();
 builder.Services.AddScoped<ChatService>();
 
 builder.Services.AddToaster(new ToasterConfiguration

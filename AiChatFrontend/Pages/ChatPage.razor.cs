@@ -10,9 +10,19 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
     [Inject] public IToaster Toastr { get; set; }
     [Inject] public NavigationManager NavMan { get; set; }
     [Inject] public ChatService ChatClient { get; set; }
+    [Inject] public CacheService Cache { get; set; }
     protected UserSession UserSession { get; set; }
+    protected string ConnectionId { get; set; }
+    protected string NewMessage { get; set; }
 
-   
+    protected async Task StartChatAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Cache.Username))
+        {
+            Toastr.Error("Username can't be empty");
+            return;
+        }
+    }
 
     public ValueTask DisposeAsync()
     {
