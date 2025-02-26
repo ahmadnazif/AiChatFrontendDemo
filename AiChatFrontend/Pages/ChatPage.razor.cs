@@ -28,6 +28,8 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
 
     protected async Task StartChatAsync()
     {
+        Toastr.Info("HELLO");
+
         if (string.IsNullOrWhiteSpace(Username))
         {
             Toastr.Error("Username can't be empty");
