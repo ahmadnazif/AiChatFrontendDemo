@@ -48,7 +48,7 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
             Chats.Clear();
 
             await Chat.ConnectAsync(Username);
-            Chat.OnMessageReceived += OnMessageReceived;
+            Chat.OnMessageReceivedOne += OnMessageReceived;
 
             UserSession = await Api.GetUserSessionByUsernameAsync(Username);
             IsChatting = true;

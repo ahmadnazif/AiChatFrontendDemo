@@ -1,6 +1,7 @@
 ﻿
 using AiChatFrontend.EventArgs;
 using Microsoft.AspNetCore.SignalR.Client;
+using System.Reflection.Metadata;
 
 namespace AiChatFrontend.Services;
 
@@ -15,7 +16,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger, Cac
     public bool IsConnected { get; set; }
 
     public delegate void MessageReceivedEventHandler(object sender, MessageReceivedEventArgs e);
-    public event MessageReceivedEventHandler OnMessageReceived;
+    public event MessageReceivedEventHandler OnMessageReceivedOne;
 
     public async Task ConnectAsync(string username)
     {
@@ -40,22 +41,19 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger, Cac
             return Task.CompletedTask;
         };
 
-        hubConnection.On<ChatHubChatResponse>("OnReceived", HandleReceive);
+        hubConnection.On<ChatHubChatResponse>("OnReceivedOne", parameter => OnMessageReceivedOne?.Invoke(this, new MessageReceivedEventArgs(parameter)));
 
         await hubConnection.StartAsync();
-
-        //await hubConnection.SendAsync("RegisterAsync", username);
-        //cache.Username = username;
         IsConnected = true;
     }
 
-    private void HandleReceive(ChatHubChatResponse parameter) => OnMessageReceived?.Invoke(this, new MessageReceivedEventArgs(parameter));
+    private void HandleReceive(ChatHubChatResponse parameter) => OnMessageReceivedOne?.Invoke(this, new MessageReceivedEventArgs(parameter));
 
     public async Task SendOneAsync(string message)
     {
         ChatHubOneChatRequest req = new()
         {
-             Message = new(ChatSender.User, message)
+            Message = new(ChatSender.User, message)
         };
 
         try
