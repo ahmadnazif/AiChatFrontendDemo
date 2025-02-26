@@ -28,4 +28,5 @@ builder.Services.AddHttpClient<ApiClient>((sp, client) =>
 {
     client.BaseAddress = new Uri(config["ApiUrl"]);
 });
+
 await builder.Build().RunAsync();
