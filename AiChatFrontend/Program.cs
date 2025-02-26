@@ -11,6 +11,8 @@ var config = builder.Configuration;
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+builder.Services.AddScoped<ChatService>();
+
 builder.Services.AddToaster(new ToasterConfiguration
 {
     PositionClass = Defaults.Classes.Position.TopCenter,
