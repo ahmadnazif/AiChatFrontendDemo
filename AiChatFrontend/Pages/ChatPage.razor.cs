@@ -98,7 +98,7 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
                 SentTime = DateTime.Now
             });
 
-            await Chat.SendAsync(NewMessage);
+            await Chat.SendOneAsync(NewMessage);
             Logger.LogInformation($"[SENT] {UserSession.Username}: {NewMessage}");
 
             NewMessage = string.Empty;

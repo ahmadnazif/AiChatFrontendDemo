@@ -51,7 +51,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger, Cac
 
     private void HandleReceive(ChatHubChatResponse parameter) => OnMessageReceived?.Invoke(this, new MessageReceivedEventArgs(parameter));
 
-    public async Task SendAsync(string message)
+    public async Task SendOneAsync(string message)
     {
         ChatHubOneChatRequest req = new()
         {
@@ -60,7 +60,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger, Cac
 
         try
         {
-            await hubConnection.SendAsync("ReceiveAsync", req);
+            await hubConnection.SendAsync("ReceiveOneAsync", req);
         }
         catch (Exception ex)
         {
