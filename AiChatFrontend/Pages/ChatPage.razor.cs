@@ -20,6 +20,12 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
     protected string NewMessage { get; set; }
     protected List<ChatMessage> Chats { get; set; } = [];
 
+    protected async Task ReconnectAsync()
+    {
+        Username = Cache.Username;
+        await StartChatAsync();
+    }
+
     protected async Task StartChatAsync()
     {
         if (string.IsNullOrWhiteSpace(Username))

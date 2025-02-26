@@ -1,6 +1,59 @@
 ﻿@page "/chat"
-<h3>ChatPage</h3>
+@inherits ChatPageBase
 
-@code {
+<h3>Generative AI Chat</h3>
 
+@if (IsChatting)
+{
+    <div>
+        <label><strong>Username</strong>: @Username | <strong>Connection ID:</strong> @UserSession?.ConnectionId | <strong>Started:</strong> @UserSession?.StartTime </label>
+        <button class="btn btn-danger btn-sm float-end" @onclick="async() => await DisconnectAsync()">Disconnect</button>
+    </div>
 }
+else
+{
+    <label>Please enter your username to start:</label>
+    <div class="col-sm-6">
+        <div class="input-group">
+            <input class="form-control" type="text" @bind="Username" />
+            <button class="btn btn-success btn-sm" @onclick="async() => await StartChatAsync()">Enter Chat</button>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Cache.Username))
+    {
+        <br />
+        <label>Or you can reconnect your last session with user: <strong>@Cache.Username</strong></label>
+        <button class="btn btn-success btn-sm" @onclick="async() => await ReconnectAsync()">Reconnect</button>
+    }
+}
+
+<br />
+
+<div class="content px-4">
+
+    @if (IsChatting)
+    {
+        <div id="scrollbox">
+            @foreach (var item in Chats)
+            {
+                <div class="@GetCss(item.IsMine)">
+                    <div class="user">@item.Username</div>
+                    <div class="msg">@item.Message</div>
+                    <font size="1">@item.SentTime.ToLongTimeString()</font>
+                </div>
+
+            }
+            <hr />
+            <div class="input-group">
+                <textarea class="form-control" rows="2" style="resize:none" placeholder="Enter you message" @bind="@NewMessage"></textarea>
+                <button class="btn btn-sm btn-success" @onclick="async() => await SendAsync()"><span class="oi oi-location"></span> Send</button>
+            </div>
+        </div>
+    }
+    else
+    {
+        @*<label><i>Please enter your name to chat</i></label>*@
+    }
+
+</div>
