@@ -10,6 +10,9 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
     [Inject] public IToaster Toastr { get; set; }
     [Inject] public NavigationManager NavMan { get; set; }
     [Inject] public ChatService ChatClient { get; set; }
+    protected UserSession UserSession { get; set; }
+
+   
 
     public ValueTask DisposeAsync()
     {
