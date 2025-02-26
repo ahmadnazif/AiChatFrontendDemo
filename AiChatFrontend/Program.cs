@@ -1,3 +1,4 @@
+global using System.Text.Json;
 global using AiChatFrontend.Models;
 using AiChatFrontend;
 using AiChatFrontend.Services;
