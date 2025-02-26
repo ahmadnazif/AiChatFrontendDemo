@@ -14,7 +14,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger, Cac
     public bool IsConnected { get; set; }
 
     public delegate void MessageReceivedEventHandler(object sender, MessageReceivedEventArgs e);
-    public event MessageReceivedEventHandler MessageReceived;
+    public event MessageReceivedEventHandler OnMessageReceived;
 
     public async Task ConnectAsync(string username)
     {
@@ -48,7 +48,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger, Cac
         IsConnected = true;
     }
 
-    private void HandleReceive(ChatHubChatResponse parameter) => MessageReceived?.Invoke(this, new MessageReceivedEventArgs(parameter));
+    private void HandleReceive(ChatHubChatResponse parameter) => OnMessageReceived?.Invoke(this, new MessageReceivedEventArgs(parameter));
 
     public async Task SendMessageAsync(string message)
     {
