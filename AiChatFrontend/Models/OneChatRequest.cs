@@ -1,6 +1,6 @@
 ﻿namespace AiChatFrontend.Models;
 
-public class ChatHubOneChatRequest
+public class OneChatRequest
 {
     public ChatRequest Message { get; set; }
 }
