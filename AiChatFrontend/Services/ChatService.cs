@@ -57,7 +57,14 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger, Cac
              Message = message
         };
 
-        await hubConnection.SendAsync("ReceiveMessageAsync", req);
+        try
+        {
+            await hubConnection.SendAsync("ReceiveMessageAsync", req);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.Message);
+        }
     }
 
     public async Task StopAsync()

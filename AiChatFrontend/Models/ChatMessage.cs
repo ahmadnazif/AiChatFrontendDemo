@@ -2,6 +2,7 @@
 
 public class ChatMessage : ChatMessageBase
 {
+
     public bool IsMine { get; set; }
 }
 

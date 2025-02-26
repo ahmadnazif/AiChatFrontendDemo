@@ -28,8 +28,6 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
 
     protected async Task StartChatAsync()
     {
-        Toastr.Info("HELLO");
-
         if (string.IsNullOrWhiteSpace(Username))
         {
             Toastr.Error("Username can't be empty");
@@ -43,6 +41,8 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
             Toastr.Error($"User {Username} already registered");
             return;
         }
+
+        Toastr.Info($"OK: {Username}");
 
         try
         {
@@ -82,7 +82,7 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
 
     protected async Task SendAsync()
     {
-        if(IsChatting && string.IsNullOrWhiteSpace(NewMessage))
+        if(IsChatting && !string.IsNullOrWhiteSpace(NewMessage))
         {
             Logger.LogInformation($"[SENT] {Cache.Username}: {NewMessage}");
             await ChatClient.SendMessageAsync(NewMessage);
