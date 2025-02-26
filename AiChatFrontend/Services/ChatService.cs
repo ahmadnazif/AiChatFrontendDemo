@@ -19,7 +19,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     public async Task ConnectAsync(string username)
     {
         var hubUrl = $"{config["ApiUrl"].TrimEnd('/')}{HUBURL}?username={username}";
-        hubConnection = new HubConnectionBuilder().WithUrl(hubUrl).WithAutomaticReconnect().Build();
+        hubConnection = new HubConnectionBuilder().WithUrl(hubUrl).WithAutomaticReconnect().AddMessagePackProtocol().Build();
         hubConnection.Closed += (e) =>
         {
             IsConnected = false;
