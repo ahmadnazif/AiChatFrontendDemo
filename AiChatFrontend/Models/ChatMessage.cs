@@ -5,7 +5,6 @@ namespace AiChatFrontend.Models;
 public class ChatMessage : ChatMessageBase
 {
     public ChatSender Sender { get; set; }
-    public bool IsMine { get; set; }
     public string Duration { get; set; }
     public string ModelId { get; set; }
 }

@@ -1,4 +1,5 @@
-﻿using AiChatFrontend.Services;
+﻿using AiChatFrontend.EventArgs;
+using AiChatFrontend.Services;
 using Microsoft.AspNetCore.Components;
 using Sotsera.Blazor.Toaster;
 using System.Text.Json.Schema;
@@ -10,8 +11,7 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
     [Inject] public ILogger<ChatPageBase> Logger { get; set; }
     [Inject] public IToaster Toastr { get; set; }
     [Inject] public NavigationManager NavMan { get; set; }
-    [Inject] public ChatService ChatClient { get; set; }
-    //[Inject] public CacheService Cache { get; set; }
+    [Inject] public ChatService Chat { get; set; }
     [Inject] public ApiClient Api { get; set; }
     protected bool IsChatting { get; set; } = false;
     protected bool IsWaitingResponse { get; set; } = false;
@@ -24,10 +24,10 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
     protected async Task ReconnectAsync()
     {
         Username = UserSession.Username;
-        await StartChatAsync();
+        await StartAsync();
     }
 
-    protected async Task StartChatAsync()
+    protected async Task StartAsync()
     {
         if (string.IsNullOrWhiteSpace(Username))
         {
@@ -43,14 +43,12 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
             return;
         }
 
-        Toastr.Info($"OK: {Username}");
-
         try
         {
             Chats.Clear();
 
-            await ChatClient.ConnectAsync(Username);
-            ChatClient.OnMessageReceived += OnMessageReceived;
+            await Chat.ConnectAsync(Username);
+            Chat.OnMessageReceived += OnMessageReceived;
 
             UserSession = await Api.GetUserSessionByUsernameAsync(Username);
             IsChatting = true;
@@ -61,20 +59,22 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
         }
     }
 
-    private void OnMessageReceived(object sender, EventArgs.MessageReceivedEventArgs e)
+    private void OnMessageReceived(object sender, MessageReceivedEventArgs e)
     {
-        IsWaitingResponse = false;
-        var param = e.Parameter;
-
-        if (param == null)
+        if (e.Parameter == null)
+        {
             Logger.LogError("paramter is NULL");
+            return;
+        }
+
+        IsWaitingResponse = false;
+        var param = e.Parameter;       
 
         Chats.Add(new()
         {
             Sender = ChatSender.AI,
             Username = param.Username,
             ConnectionId = param.ConnectionId,
-            IsMine = IsMine(param),
             Message = param.ResponseMessage,
             SentTime = DateTime.Now,
             Duration = param.Duration.ToString(),
@@ -92,30 +92,18 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
             Chats.Add(new()
             {
                 Sender = ChatSender.User,
-                IsMine = true,
                 ConnectionId = UserSession.ConnectionId,
                 Username = UserSession.Username,
                 Message = NewMessage,
                 SentTime = DateTime.Now
             });
 
-            await ChatClient.SendMessageAsync(NewMessage);
+            await Chat.SendMessageAsync(NewMessage);
             Logger.LogInformation($"[SENT] {UserSession.Username}: {NewMessage}");
 
             NewMessage = string.Empty;
             IsWaitingResponse = true;
         }
-    }
-
-    private bool IsMine(ChatHubChatResponse param)
-    {
-        bool isMine = false;
-        if (!string.IsNullOrWhiteSpace(param.Username))
-        {
-            isMine = string.Equals(param.Username, Username, StringComparison.CurrentCultureIgnoreCase);
-        }
-
-        return isMine;
     }
 
     protected static string GetCss(ChatSender sender) => sender switch
@@ -129,7 +117,7 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
     {
         if (IsChatting)
         {
-            await ChatClient.StopAsync();
+            await Chat.StopAsync();
             UserSession = new() { Username = Username };
             Username = null;
             IsChatting = false;
