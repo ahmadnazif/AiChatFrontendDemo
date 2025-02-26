@@ -20,10 +20,10 @@ else
         </div>
     </div>
 
-    @if (!string.IsNullOrWhiteSpace(Cache.Username))
+    @if (!string.IsNullOrWhiteSpace(UserSession?.Username))
     {
         <br />
-        <label>Or you can reconnect your last session with user: <strong>@Cache.Username</strong></label>
+        <label>Or you can reconnect your last session with user: <strong>@UserSession.Username</strong></label>
         <button class="btn btn-success btn-sm" @onclick="async() => await ReconnectAsync()">Reconnect</button>
     }
 }
@@ -37,7 +37,7 @@ else
         <div id="scrollbox">
             @foreach (var item in Chats)
             {
-                <div class="@GetCss(item.IsMine)">
+                <div class="@GetCss(item.Sender)">
                     <div class="user">@item.Username</div>
                     <div class="msg">@item.Message</div>
                     <font size="1">@item.SentTime.ToLongTimeString()</font>

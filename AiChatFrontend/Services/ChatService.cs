@@ -11,6 +11,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger, Cac
     private readonly IConfiguration config = config;
     private readonly ILogger<ChatService> logger = logger;
     private readonly CacheService cache = cache;
+
     public bool IsConnected { get; set; }
 
     public delegate void MessageReceivedEventHandler(object sender, MessageReceivedEventArgs e);
@@ -44,7 +45,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger, Cac
         await hubConnection.StartAsync();
 
         //await hubConnection.SendAsync("RegisterAsync", username);
-        cache.Username = username;
+        //cache.Username = username;
         IsConnected = true;
     }
 

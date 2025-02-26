@@ -11,7 +11,7 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
     [Inject] public IToaster Toastr { get; set; }
     [Inject] public NavigationManager NavMan { get; set; }
     [Inject] public ChatService ChatClient { get; set; }
-    [Inject] public CacheService Cache { get; set; }
+    //[Inject] public CacheService Cache { get; set; }
     [Inject] public ApiClient Api { get; set; }
     protected bool IsChatting { get; set; } = false;
     protected string Username { get; set; }
@@ -22,7 +22,7 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
 
     protected async Task ReconnectAsync()
     {
-        Username = Cache.Username;
+        Username = UserSession.Username;
         await StartChatAsync();
     }
 
@@ -69,6 +69,7 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
 
         Chats.Add(new()
         {
+            Sender = ChatSender.AI,
             Username = param.Username,
             ConnectionId = param.ConnectionId,
             IsMine = IsMine(param),
@@ -82,9 +83,20 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
 
     protected async Task SendAsync()
     {
-        if(IsChatting && !string.IsNullOrWhiteSpace(NewMessage))
+        if (IsChatting && !string.IsNullOrWhiteSpace(NewMessage))
         {
-            Logger.LogInformation($"[SENT] {Cache.Username}: {NewMessage}");
+            Logger.LogInformation($"[SENT] {UserSession.Username}: {NewMessage}");
+
+            Chats.Add(new()
+            {
+                Sender = ChatSender.User,
+                IsMine = true,
+                ConnectionId = UserSession.ConnectionId,
+                Username = UserSession.Username,
+                Message = NewMessage,
+                SentTime = DateTime.Now
+            });
+
             await ChatClient.SendMessageAsync(NewMessage);
             NewMessage = string.Empty;
         }
@@ -101,15 +113,20 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
         return isMine;
     }
 
-    protected static string GetCss(bool isMine) => isMine ? "sent" : "received";
+    protected static string GetCss(ChatSender sender) => sender switch
+    {
+        ChatSender.AI => "received",
+        ChatSender.User => "sent",
+        _ => string.Empty,
+    };
 
     protected async Task DisconnectAsync()
     {
         if (IsChatting)
         {
             await ChatClient.StopAsync();
+            UserSession = new() { Username = Username };
             Username = null;
-            UserSession = null;
             IsChatting = false;
         }
     }

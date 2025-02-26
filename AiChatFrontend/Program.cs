@@ -1,5 +1,6 @@
 global using System.Text.Json;
 global using AiChatFrontend.Models;
+global using AiChatFrontend.Enums;
 using AiChatFrontend;
 using AiChatFrontend.Services;
 using Microsoft.AspNetCore.Components.Web;
