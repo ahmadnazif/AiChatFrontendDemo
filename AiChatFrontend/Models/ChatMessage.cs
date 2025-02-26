@@ -1,8 +1,10 @@
-﻿namespace AiChatFrontend.Models;
+﻿using AiChatFrontend.Enums;
+
+namespace AiChatFrontend.Models;
 
 public class ChatMessage : ChatMessageBase
 {
-
+    public ChatSender Sender { get; set; }
     public bool IsMine { get; set; }
 }
 
