@@ -67,26 +67,26 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
             return;
         }
 
-        if (e.Parameter == null)
+        if (e.Response == null)
         {
-            Logger.LogError("paramter is NULL");
+            Logger.LogError("e.Response is NULL");
             return;
         }
 
         IsWaitingResponse = false;
-        var param = e.Parameter;       
+        var resp = e.Response;       
 
         ChatLogs.Add(new()
         {
-            Username = param.Username,
-            ConnectionId = param.ConnectionId,
-            Message = new(ChatSender.Assistant, param.ResponseMessage),
+            Username = resp.Username,
+            ConnectionId = resp.ConnectionId,
+            Message = new(ChatSender.Assistant, resp.ResponseMessage),
             SentTime = DateTime.Now,
-            Duration = param.Duration.ToString(),
-            ModelId = param.ModelId
+            Duration = resp.Duration.ToString(),
+            ModelId = resp.ModelId
         });
 
-        Logger.LogInformation($"[RECEIVED] {JsonSerializer.Serialize(param)}");
+        Logger.LogInformation($"[RECEIVED] {JsonSerializer.Serialize(resp)}");
         StateHasChanged();
     }
 
