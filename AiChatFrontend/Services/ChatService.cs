@@ -14,8 +14,8 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
 
     public bool IsConnected { get; set; }
 
-    public delegate void MessageReceivedEventHandler(object sender, OneChatReceivedEventArgs e);
-    public event MessageReceivedEventHandler OnMessageReceivedOne;
+    public delegate void OneChatReceivedEventHandler(object sender, OneChatReceivedEventArgs e);
+    public event OneChatReceivedEventHandler OnMessageReceivedOne;
 
     public async Task ConnectAsync(string username)
     {
