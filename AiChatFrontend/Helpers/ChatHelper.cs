@@ -6,8 +6,8 @@ public static class ChatHelper
 {
     public static string GetPageTitle(ChatPageType type) => type switch
     {
-        ChatPageType.FireAndForget => "Generative AI Chat (Fire and Forget)",
-        ChatPageType.ChainedChat => "Generative AI Chat (Chained)",
+        ChatPageType.FireAndForget => "Generative AI (One Chat: Fire and Forget)",
+        ChatPageType.ChainedChat => "Generative AI (Chained Chat)",
         _ => "-",
     };
 
