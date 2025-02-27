@@ -48,7 +48,31 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
             ChatLogs.Clear();
 
             await Chat.ConnectAsync(Username);
-            Chat.OnMessageReceivedOne += OnMessageReceived;
+
+            Chat.OnMessageReceivedOne += (s, e) =>
+            {
+                if (e.Response == null)
+                {
+                    Logger.LogError("e.Response is NULL");
+                    return;
+                }
+
+                IsWaitingResponse = false;
+                var resp = e.Response;
+
+                ChatLogs.Add(new()
+                {
+                    Username = resp.Username,
+                    ConnectionId = resp.ConnectionId,
+                    Message = new(ChatSender.Assistant, resp.ResponseMessage),
+                    SentTime = DateTime.Now,
+                    Duration = resp.Duration.ToString(),
+                    ModelId = resp.ModelId
+                });
+
+                Logger.LogInformation($"[RECEIVED] {JsonSerializer.Serialize(resp)}");
+                StateHasChanged();
+            };
 
             UserSession = await Api.GetUserSessionByUsernameAsync(Username);
             IsChatting = true;
