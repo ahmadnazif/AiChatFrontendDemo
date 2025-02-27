@@ -35,7 +35,7 @@ else
     @if (IsChatting)
     {
         <div id="scrollbox">
-            @foreach (var item in Chats)
+            @foreach (var item in ChatLogs)
             {
                 <div class="@ChatLogHelper.GetChatCss(item)">
                     <div class="user">@ChatLogHelper.GetUsername(item)</div>

@@ -19,7 +19,7 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
     protected UserSession UserSession { get; set; }
     protected string ConnectionId { get; set; }
     protected string NewMessage { get; set; }
-    protected List<ChatLog> Chats { get; set; } = [];
+    protected List<ChatLog> ChatLogs { get; set; } = [];
 
     protected async Task ReconnectAsync()
     {
@@ -45,7 +45,7 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
 
         try
         {
-            Chats.Clear();
+            ChatLogs.Clear();
 
             await Chat.ConnectAsync(Username);
             Chat.OnMessageReceivedOne += OnMessageReceived;
@@ -76,7 +76,7 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
         IsWaitingResponse = false;
         var param = e.Parameter;       
 
-        Chats.Add(new()
+        ChatLogs.Add(new()
         {
             Username = param.Username,
             ConnectionId = param.ConnectionId,
@@ -94,7 +94,7 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
     {
         if (IsChatting && !string.IsNullOrWhiteSpace(NewMessage))
         {
-            Chats.Add(new()
+            ChatLogs.Add(new()
             {
                 ConnectionId = UserSession.ConnectionId,
                 Username = UserSession.Username,
