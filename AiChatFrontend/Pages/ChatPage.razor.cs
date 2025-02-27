@@ -19,7 +19,7 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
     protected UserSession UserSession { get; set; }
     protected string ConnectionId { get; set; }
     protected string NewMessage { get; set; }
-    protected List<ChatMessage> Chats { get; set; } = [];
+    protected List<ChatLog> Chats { get; set; } = [];
 
     protected async Task ReconnectAsync()
     {
@@ -106,7 +106,7 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
         }
     }
 
-    protected static string GetUsername(ChatMessage msg)
+    protected static string GetUsername(ChatLog msg)
     {
         return msg.Sender switch
         {
@@ -116,7 +116,7 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
         };
     }
 
-    protected static string GetChatFooter(ChatMessage msg)
+    protected static string GetChatFooter(ChatLog msg)
     {
         return msg.Sender switch
         {
