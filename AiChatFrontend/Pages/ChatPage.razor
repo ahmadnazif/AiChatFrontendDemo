@@ -37,10 +37,10 @@ else
         <div id="scrollbox">
             @foreach (var item in ChatLogs)
             {
-                <div class="@ChatLogHelper.GetChatCss(item)">
-                    <div class="user">@ChatLogHelper.GetUsername(item)</div>
-                    <div class="msg">@ChatLogHelper.GetMessageText(item)</div>
-                    <font size="1">@ChatLogHelper.GetChatFooter(item)</font>
+                <div class="@ChatHelper.GetChatCss(item)">
+                    <div class="user">@ChatHelper.GetUsername(item)</div>
+                    <div class="msg">@ChatHelper.GetMessageText(item)</div>
+                    <font size="1">@ChatHelper.GetChatFooter(item)</font>
                 </div>
             }
             <hr />

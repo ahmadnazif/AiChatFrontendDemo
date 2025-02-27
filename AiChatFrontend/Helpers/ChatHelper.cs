@@ -2,7 +2,7 @@
 
 namespace AiChatFrontend.Helpers;
 
-public static class ChatLogHelper
+public static class ChatHelper
 {
     public static List<ChatMsg> BuildPreviousMessages(List<ChatLog> logs)
     {

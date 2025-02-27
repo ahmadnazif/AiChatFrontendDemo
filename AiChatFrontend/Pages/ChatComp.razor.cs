@@ -1,14 +1,13 @@
-﻿using AiChatFrontend.EventArgs;
-using AiChatFrontend.Services;
+﻿using AiChatFrontend.Services;
 using Microsoft.AspNetCore.Components;
 using Sotsera.Blazor.Toaster;
-using System.Text.Json.Schema;
 
 namespace AiChatFrontend.Pages;
 
-public class ChainedChatPageBase : ComponentBase, IAsyncDisposable
+public class ChatCompBase : ComponentBase, IAsyncDisposable
 {
-    [Inject] public ILogger<ChainedChatPageBase> Logger { get; set; }
+    [Parameter] public ChatPageType PageType { get; set; }    
+    [Inject] public ILogger<ChatCompBase> Logger { get; set; }
     [Inject] public IToaster Toastr { get; set; }
     [Inject] public NavigationManager NavMan { get; set; }
     [Inject] public ChatService Chat { get; set; }
