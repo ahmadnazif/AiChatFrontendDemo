@@ -1,5 +1,5 @@
-﻿
-using AiChatFrontend.EventArgs;
+﻿using AiChatFrontend.EventArgs;
+using AiChatFrontend.EventHandlers;
 using Microsoft.AspNetCore.SignalR.Client;
 using System.Reflection.Metadata;
 
@@ -14,7 +14,6 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
 
     public bool IsConnected { get; set; }
 
-    public delegate void OneChatReceivedEventHandler(object sender, OneChatReceivedEventArgs e);
     public event OneChatReceivedEventHandler OnOneChatReceived;
 
     public async Task ConnectAsync(string username)
