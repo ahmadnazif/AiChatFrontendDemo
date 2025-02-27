@@ -5,13 +5,12 @@ using System.Reflection.Metadata;
 
 namespace AiChatFrontend.Services;
 
-public class ChatService(IConfiguration config, ILogger<ChatService> logger, CacheService cache) : IAsyncDisposable
+public class ChatService(IConfiguration config, ILogger<ChatService> logger) : IAsyncDisposable
 {
     public const string HUBURL = "/chat-hub";
     private HubConnection hubConnection;
     private readonly IConfiguration config = config;
     private readonly ILogger<ChatService> logger = logger;
-    private readonly CacheService cache = cache;
 
     public bool IsConnected { get; set; }
 
