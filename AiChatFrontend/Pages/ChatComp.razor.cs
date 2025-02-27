@@ -104,7 +104,7 @@ public class ChatCompBase : ComponentBase, IAsyncDisposable
         {
             Username = resp.Username,
             ConnectionId = resp.ConnectionId,
-            Message = new(ChatSender.Assistant, resp.ResponseMessage),
+            Message = resp.ResponseMessage, //new(ChatSender.Assistant, resp.ResponseMessage),
             SentTime = DateTime.Now,
             Duration = resp.Duration.ToString(),
             ModelId = resp.ModelId
