@@ -16,6 +16,7 @@ public class ApiClient
         this.httpClient = httpClient;
     }
 
+    #region /hub
     public async Task<bool> IsUserRegisteredAsync(string username)
     {
         try
@@ -83,4 +84,25 @@ public class ApiClient
             return new();
         }
     }
+
+    #endregion
+
+    #region /info
+    public async Task<object> GetAiRuntimeInfoAsync()
+    {
+        try
+        {
+            var response = await httpClient.GetAsync($"rest-api/info/get-ai-runtime-info");
+
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadFromJsonAsync<object>();
+            else
+                return new { Status = "API not connected" };
+        }
+        catch (Exception ex)
+        {
+            return new { Exception = ex.Message };
+        }
+    }
+    #endregion
 }

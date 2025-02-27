@@ -1,7 +1,35 @@
 ﻿@page "/"
+@using System.Diagnostics;
+@inject AiChatFrontend.Services.ApiClient Api
+@inject IToaster Toastr
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h3>Backend Server Status</h3>
+<button class="btn btn-success btn-sm float-end" @onclick="async() => await RefreshAsync(true)">Refresh</button>
 
-Welcome to your new app.
+<pre>
+@Result
+</pre>
+
+@code{
+
+    private object Result { get; set; }
+    private JsonSerializerOptions opt = new() { WriteIndented = true };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshAsync();
+    }
+
+    private async Task RefreshAsync(bool showToastr = false)
+    {
+        Stopwatch sw = Stopwatch.StartNew();
+        var result = await Api.GetAiRuntimeInfoAsync();
+        Result = JsonSerializer.Serialize(result, opt);
+        sw.Stop();
+
+        if (showToastr)
+            Toastr.Success($"Refreshed [{sw.Elapsed}]");
+    }
+}
