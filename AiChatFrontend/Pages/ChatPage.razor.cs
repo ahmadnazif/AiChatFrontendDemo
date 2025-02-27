@@ -61,6 +61,12 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
 
     private void OnMessageReceived(object sender, MessageReceivedEventArgs e)
     {
+        if(e == null)
+        {
+            Logger.LogError("e is NULL");
+            return;
+        }
+
         if (e.Parameter == null)
         {
             Logger.LogError("paramter is NULL");
