@@ -2,5 +2,5 @@
 
 namespace AiChatFrontend.EventHandlers;
 
-public delegate void ChainedChatReceivedEventHandler(object sender, OneChatReceivedEventArgs e);
+public delegate void ChainedChatReceivedEventHandler(object sender, ChainedChatReceivedEventArgs e);
 
