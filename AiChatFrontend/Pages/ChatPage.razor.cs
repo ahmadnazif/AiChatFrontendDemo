@@ -83,7 +83,7 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
         }
     }
 
-    private void OnMessageReceived(object sender, MessageReceivedEventArgs e)
+    private void OnMessageReceived(object sender, OneChatReceivedEventArgs e)
     {
         if(e == null)
         {
