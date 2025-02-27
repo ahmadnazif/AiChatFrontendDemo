@@ -2,5 +2,5 @@
 
 public class OneChatRequest
 {
-    public ChatRequest Message { get; set; }
+    public ChatMessage Message { get; set; }
 }
