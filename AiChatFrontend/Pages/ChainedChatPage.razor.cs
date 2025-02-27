@@ -49,7 +49,7 @@ public class ChainedChatPageBase : ComponentBase, IAsyncDisposable
 
             await Chat.ConnectAsync(Username);
 
-            Chat.OnOneChatReceived += (s, e) =>
+            Chat.OnChainedChatReceived += (s, e) =>
             {
                 if (e.Response == null)
                 {
@@ -64,7 +64,7 @@ public class ChainedChatPageBase : ComponentBase, IAsyncDisposable
                 {
                     Username = resp.Username,
                     ConnectionId = resp.ConnectionId,
-                    Message = new(ChatSender.Assistant, resp.ResponseMessage),
+                    Message = resp.ResponseMessage,
                     SentTime = DateTime.Now,
                     Duration = resp.Duration.ToString(),
                     ModelId = resp.ModelId
@@ -83,37 +83,6 @@ public class ChainedChatPageBase : ComponentBase, IAsyncDisposable
         }
     }
 
-    private void OnMessageReceived(object sender, OneChatReceivedEventArgs e)
-    {
-        if (e == null)
-        {
-            Logger.LogError("e is NULL");
-            return;
-        }
-
-        if (e.Response == null)
-        {
-            Logger.LogError("e.Response is NULL");
-            return;
-        }
-
-        IsWaitingResponse = false;
-        var resp = e.Response;
-
-        ChatLogs.Add(new()
-        {
-            Username = resp.Username,
-            ConnectionId = resp.ConnectionId,
-            Message = new(ChatSender.Assistant, resp.ResponseMessage),
-            SentTime = DateTime.Now,
-            Duration = resp.Duration.ToString(),
-            ModelId = resp.ModelId
-        });
-
-        Logger.LogInformation($"[RECEIVED] {JsonSerializer.Serialize(resp)}");
-        StateHasChanged();
-    }
-
     protected async Task SendAsync()
     {
         if (IsChatting && !string.IsNullOrWhiteSpace(NewMessage))
@@ -126,7 +95,8 @@ public class ChainedChatPageBase : ComponentBase, IAsyncDisposable
                 SentTime = DateTime.Now
             });
 
-            await Chat.SendOneAsync(NewMessage);
+            var prev = ChatLogHelper.BuildPreviousMessages(ChatLogs);
+            await Chat.SendChainedAsync(NewMessage, prev);
             Logger.LogInformation($"[SENT] {UserSession.Username}: {NewMessage}");
 
             NewMessage = string.Empty;

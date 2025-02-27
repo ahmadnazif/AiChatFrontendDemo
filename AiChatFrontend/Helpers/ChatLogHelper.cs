@@ -4,6 +4,16 @@ namespace AiChatFrontend.Helpers;
 
 public static class ChatLogHelper
 {
+    public static List<ChatMsg> BuildPreviousMessages(List<ChatLog> logs)
+    {
+        List<ChatMsg> list = [];
+
+        foreach(var m in logs)
+            list.Add(m.Message);
+
+        return list;
+    }
+
     public static string GetChatCss(ChatLog log)
     {
         return log.Message.Sender switch
