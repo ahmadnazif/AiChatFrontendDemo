@@ -1,4 +1,5 @@
-﻿using AiChatFrontend.Services;
+﻿using AiChatFrontend.EventArgs;
+using AiChatFrontend.Services;
 using Microsoft.AspNetCore.Components;
 using Sotsera.Blazor.Toaster;
 
@@ -6,7 +7,7 @@ namespace AiChatFrontend.Pages;
 
 public class ChatCompBase : ComponentBase, IAsyncDisposable
 {
-    [Parameter] public ChatPageType PageType { get; set; }    
+    [Parameter] public ChatPageType PageType { get; set; }
     [Inject] public ILogger<ChatCompBase> Logger { get; set; }
     [Inject] public IToaster Toastr { get; set; }
     [Inject] public NavigationManager NavMan { get; set; }
@@ -47,39 +48,70 @@ public class ChatCompBase : ComponentBase, IAsyncDisposable
             ChatLogs.Clear();
 
             await Chat.ConnectAsync(Username);
-
-            Chat.OnChainedChatReceived += (s, e) =>
-            {
-                if (e.Response == null)
-                {
-                    Logger.LogError("e.Response is NULL");
-                    return;
-                }
-
-                IsWaitingResponse = false;
-                var resp = e.Response;
-
-                ChatLogs.Add(new()
-                {
-                    Username = resp.Username,
-                    ConnectionId = resp.ConnectionId,
-                    Message = resp.ResponseMessage,
-                    SentTime = DateTime.Now,
-                    Duration = resp.Duration.ToString(),
-                    ModelId = resp.ModelId
-                });
-
-                Logger.LogInformation($"[RECEIVED] {JsonSerializer.Serialize(resp)}");
-                StateHasChanged();
-            };
-
             UserSession = await Api.GetUserSessionByUsernameAsync(Username);
+
+            switch (PageType)
+            {
+                case ChatPageType.ChainedChat: Chat.OnChainedChatReceived += this.OnChainedChatReceived; break;
+                case ChatPageType.FireAndForget: Chat.OnOneChatReceived += this.OnOneChatReceived; break;
+            }
+
             IsChatting = true;
         }
         catch (Exception ex)
         {
-            Logger.LogCritical(ex.Message);
+            LogError(ex.Message, true);
         }
+    }
+
+    private void OnChainedChatReceived(object sender, ChainedChatReceivedEventArgs e)
+    {
+        if (e.Response == null)
+        {
+            LogError("e.Response is NULL");
+            return;
+        }
+
+        IsWaitingResponse = false;
+        var resp = e.Response;
+
+        ChatLogs.Add(new()
+        {
+            Username = resp.Username,
+            ConnectionId = resp.ConnectionId,
+            Message = resp.ResponseMessage,
+            SentTime = DateTime.Now,
+            Duration = resp.Duration.ToString(),
+            ModelId = resp.ModelId
+        });
+
+        Log($"[RECEIVED] {JsonSerializer.Serialize(resp)}");
+        StateHasChanged();
+    }
+
+    private void OnOneChatReceived(object sender, OneChatReceivedEventArgs e)
+    {
+        if (e.Response == null)
+        {
+            LogError("e.Response is NULL");
+            return;
+        }
+
+        IsWaitingResponse = false;
+        var resp = e.Response;
+
+        ChatLogs.Add(new()
+        {
+            Username = resp.Username,
+            ConnectionId = resp.ConnectionId,
+            Message = new(ChatSender.Assistant, resp.ResponseMessage),
+            SentTime = DateTime.Now,
+            Duration = resp.Duration.ToString(),
+            ModelId = resp.ModelId
+        });
+
+        Log($"[RECEIVED] {JsonSerializer.Serialize(resp)}");
+        StateHasChanged();
     }
 
     protected async Task SendAsync()
@@ -95,8 +127,14 @@ public class ChatCompBase : ComponentBase, IAsyncDisposable
             });
 
             var prev = ChatHelper.BuildPreviousMessages(ChatLogs);
-            await Chat.SendChainedAsync(NewMessage, prev);
-            Logger.LogInformation($"[SENT] {UserSession.Username}: {NewMessage}");
+
+            switch (PageType)
+            {
+                case ChatPageType.ChainedChat: await Chat.SendChainedAsync(NewMessage, prev); break;
+                case ChatPageType.FireAndForget: await Chat.SendOneAsync(NewMessage); break;
+            }
+
+            Log($"[SENT] {UserSession.Username}: {NewMessage}");
 
             NewMessage = string.Empty;
             IsWaitingResponse = true;
@@ -118,6 +156,18 @@ public class ChatCompBase : ComponentBase, IAsyncDisposable
     {
         await DisconnectAsync();
         GC.SuppressFinalize(this);
+        Log("Disposed");
+    }
+
+    private void Log(string text) => Logger.LogInformation($"{DateTime.Now.ToLongTimeString} | {PageType} || {text}");
+
+    private void LogError(string text, bool isCritical = false)
+    {
+        var log = $"{DateTime.Now.ToLongTimeString} | {PageType} || {text}";
+        if (isCritical)
+            Logger.LogCritical(log);
+        else
+            Logger.LogError(log);
     }
 }
 

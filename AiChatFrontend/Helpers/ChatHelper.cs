@@ -4,6 +4,13 @@ namespace AiChatFrontend.Helpers;
 
 public static class ChatHelper
 {
+    public static string GetPageTitle(ChatPageType type) => type switch
+    {
+        ChatPageType.FireAndForget => "Generative AI Chat (Fire and Forget)",
+        ChatPageType.ChainedChat => "Generative AI Chat (Chained)",
+        _ => "-",
+    };
+
     public static List<ChatMsg> BuildPreviousMessages(List<ChatLog> logs)
     {
         List<ChatMsg> list = [];
