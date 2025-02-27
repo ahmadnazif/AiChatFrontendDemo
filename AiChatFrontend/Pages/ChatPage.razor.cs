@@ -49,7 +49,7 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
 
             await Chat.ConnectAsync(Username);
 
-            Chat.OnMessageReceivedOne += (s, e) =>
+            Chat.OnOneChatReceived += (s, e) =>
             {
                 if (e.Response == null)
                 {

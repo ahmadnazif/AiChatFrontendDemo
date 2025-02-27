@@ -15,7 +15,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     public bool IsConnected { get; set; }
 
     public delegate void OneChatReceivedEventHandler(object sender, OneChatReceivedEventArgs e);
-    public event OneChatReceivedEventHandler OnMessageReceivedOne;
+    public event OneChatReceivedEventHandler OnOneChatReceived;
 
     public async Task ConnectAsync(string username)
     {
@@ -40,7 +40,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
             return Task.CompletedTask;
         };
 
-        hubConnection.On<OneChatResponse>("OnReceivedOne", parameter => OnMessageReceivedOne?.Invoke(this, new OneChatReceivedEventArgs(parameter)));
+        hubConnection.On<OneChatResponse>("OnReceivedOne", parameter => OnOneChatReceived?.Invoke(this, new OneChatReceivedEventArgs(parameter)));
         //hubConnection.On<ChainedChatResponse>("OnReceivedChained", handler => )
 
         await hubConnection.StartAsync();
