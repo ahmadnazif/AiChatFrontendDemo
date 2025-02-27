@@ -78,10 +78,9 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
 
         Chats.Add(new()
         {
-            Sender = ChatSender.Assistant,
             Username = param.Username,
             ConnectionId = param.ConnectionId,
-            Message = param.ResponseMessage,
+            Message = new(ChatSender.Assistant, param.ResponseMessage),
             SentTime = DateTime.Now,
             Duration = param.Duration.ToString(),
             ModelId = param.ModelId
@@ -97,10 +96,9 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
         {
             Chats.Add(new()
             {
-                Sender = ChatSender.User,
                 ConnectionId = UserSession.ConnectionId,
                 Username = UserSession.Username,
-                Message = NewMessage,
+                Message = new(ChatSender.User, NewMessage),
                 SentTime = DateTime.Now
             });
 
@@ -114,17 +112,17 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
 
     protected static string GetUsername(ChatLog msg)
     {
-        return msg.Sender switch
+        return msg.Message.Sender switch
         {
             ChatSender.User => msg.Username,
-            ChatSender.Assistant => msg.Sender.ToString(),
+            ChatSender.Assistant => msg.Message.Sender.ToString(),
             _ => string.Empty,
         };
     }
 
     protected static string GetChatFooter(ChatLog msg)
     {
-        return msg.Sender switch
+        return msg.Message.Sender switch
         {
             ChatSender.Assistant => $"{msg.SentTime.ToLongTimeString()}  |  Time taken: {msg.Duration}  |  Model: {msg.ModelId}",
             ChatSender.User => msg.SentTime.ToLongTimeString(),
@@ -138,6 +136,11 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
         ChatSender.User => "sent",
         _ => string.Empty,
     };
+
+    protected static MarkupString GetMessageText(ChatLog log)
+    {
+        return new(log.Message.Text);
+    }
 
     protected async Task DisconnectAsync()
     {
