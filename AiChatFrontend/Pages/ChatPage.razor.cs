@@ -108,39 +108,7 @@ public class ChatPageBase : ComponentBase, IAsyncDisposable
             NewMessage = string.Empty;
             IsWaitingResponse = true;
         }
-    }
-
-    protected static string GetUsername(ChatLog msg)
-    {
-        return msg.Message.Sender switch
-        {
-            ChatSender.User => msg.Username,
-            ChatSender.Assistant => msg.Message.Sender.ToString(),
-            _ => string.Empty,
-        };
-    }
-
-    protected static string GetChatFooter(ChatLog msg)
-    {
-        return msg.Message.Sender switch
-        {
-            ChatSender.Assistant => $"{msg.SentTime.ToLongTimeString()}  |  Time taken: {msg.Duration}  |  Model: {msg.ModelId}",
-            ChatSender.User => msg.SentTime.ToLongTimeString(),
-            _ => string.Empty,
-        };
-    }
-
-    protected static string GetCss(ChatSender sender) => sender switch
-    {
-        ChatSender.Assistant => "received",
-        ChatSender.User => "sent",
-        _ => string.Empty,
-    };
-
-    protected static MarkupString GetMessageText(ChatLog log)
-    {
-        return new(log.Message.Text);
-    }
+    } 
 
     protected async Task DisconnectAsync()
     {
