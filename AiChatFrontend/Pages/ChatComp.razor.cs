@@ -159,11 +159,11 @@ public class ChatCompBase : ComponentBase, IAsyncDisposable
         Log("Disposed");
     }
 
-    private void Log(string text) => Logger.LogInformation($"{DateTime.Now.ToLongTimeString} | {PageType} || {text}");
+    private void Log(string text) => Logger.LogInformation($"{DateTime.Now.ToLongTimeString()} | {PageType} || {text}");
 
     private void LogError(string text, bool isCritical = false)
     {
-        var log = $"{DateTime.Now.ToLongTimeString} | {PageType} || {text}";
+        var log = $"{DateTime.Now.ToLongTimeString()} | {PageType} || {text}";
         if (isCritical)
             Logger.LogCritical(log);
         else
