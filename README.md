@@ -14,7 +14,7 @@ This is a Blazor WebAssembly standalone app, that connected to AI Chat Backend a
 ## App technology & dependency
 - Blazor WebAssembly Standalone (.NET 8)
 - SignalR client with MsgPack serialization
-- Since this app is using SignalR, the underlying WebSocket & SSE (server-sent event) is used to power the real-time chatting.
+- Since this app is using SignalR, the underlying WebSocket & SSE (server-sent event) is used to power the real-time interactions.
 
 ## Misc
 - Backend API server (AiChatBackend) must be running in order this app to work.
