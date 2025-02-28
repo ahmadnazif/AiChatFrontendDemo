@@ -15,12 +15,12 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     public bool IsConnected { get; set; }
 
     /// <summary>
-    /// Occured when one message received
+    /// Occured when single message received
     /// </summary>
-    public event SingleChatReceivedEventHandler OnOneChatReceived;
+    public event SingleChatReceivedEventHandler OnSingleChatReceived;
 
     /// <summary>
-    /// Occured when one message with chained previous message received
+    /// Occured when single message with chained previous message received
     /// </summary>
     public event ChainedChatReceivedEventHandler OnChainedChatReceived;
 
@@ -52,7 +52,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
             return Task.CompletedTask;
         };
 
-        hubConnection.On<SingleChatResponse>("OnReceivedOne", response => OnOneChatReceived?.Invoke(this, new SingleChatReceivedEventArgs(response)));
+        hubConnection.On<SingleChatResponse>("OnReceivedSingle", response => OnSingleChatReceived?.Invoke(this, new SingleChatReceivedEventArgs(response)));
         hubConnection.On<ChainedChatResponse>("OnReceivedChained", response => OnChainedChatReceived?.Invoke(this, new ChainedChatReceivedEventArgs(response)));
 
         await hubConnection.StartAsync();
@@ -60,11 +60,11 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     }
 
     /// <summary>
-    /// Send one message (fire and forget the previous message)
+    /// Send single message (fire and forget the previous message)
     /// </summary>
     /// <param name="message"></param>
     /// <returns></returns>
-    public async Task SendOneAsync(string message)
+    public async Task SendSingleAsync(string message)
     {
         SingleChatRequest req = new()
         {
@@ -73,7 +73,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
 
         try
         {
-            await hubConnection.SendAsync("ReceiveOneAsync", req);
+            await hubConnection.SendAsync("ReceiveSingleAsync", req);
         }
         catch (Exception ex)
         {

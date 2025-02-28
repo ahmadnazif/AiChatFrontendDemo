@@ -53,7 +53,7 @@ public class ChatCompBase : ComponentBase, IAsyncDisposable
             switch (PageType)
             {
                 case ChatPageType.ChainedChat: Chat.OnChainedChatReceived += this.OnChainedChatReceived; break;
-                case ChatPageType.FireAndForget: Chat.OnOneChatReceived += this.OnOneChatReceived; break;
+                case ChatPageType.FireAndForget: Chat.OnSingleChatReceived += this.OnOneChatReceived; break;
             }
 
             IsChatting = true;
