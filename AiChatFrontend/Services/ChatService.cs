@@ -17,7 +17,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     /// <summary>
     /// Occured when one message received
     /// </summary>
-    public event OneChatReceivedEventHandler OnOneChatReceived;
+    public event SingleChatReceivedEventHandler OnOneChatReceived;
 
     /// <summary>
     /// Occured when one message with chained previous message received
