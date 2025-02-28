@@ -10,22 +10,15 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
     private const string NAME = nameof(ApiClient);
     private readonly ILogger<ApiClient> logger = logger;
     private readonly IHttpClientFactory fac = fac;
-    //private readonly HttpClient httpClient;
 
-    //public ApiClient(HttpClient httpClient)
-    //{
-    //    httpClient.DefaultRequestHeaders.Accept.Clear();
-    //    httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-    //    this.httpClient = httpClient;
-    //}
-
-    #region /hub
+    #region /hub-info
+    public const string HUBINFO = "hub-info";
     public async Task<bool> IsUserRegisteredAsync(string username)
     {
         try
         {
             var httpClient = fac.CreateClient(NAME);
-            var response = await httpClient.GetAsync($"rest-api/hub/user/is-username-registered?username={username}");
+            var response = await httpClient.GetAsync($"{HUBINFO}/user/is-username-registered?username={username}");
 
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadFromJsonAsync<bool>();
@@ -44,7 +37,7 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         try
         {
             var httpClient = fac.CreateClient(NAME);
-            var response = await httpClient.GetAsync($"rest-api/hub/user/is-connection-id-active?connectionId={connectionId}");
+            var response = await httpClient.GetAsync($"{HUBINFO}/user/is-connection-id-active?connectionId={connectionId}");
 
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadFromJsonAsync<bool>();
@@ -63,7 +56,7 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         try
         {
             var httpClient = fac.CreateClient(NAME);
-            var response = await httpClient.GetAsync($"rest-api/hub/user/get-by-username?username={username}");
+            var response = await httpClient.GetAsync($"{HUBINFO}/user/get-by-username?username={username}");
 
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadFromJsonAsync<UserSession>();
@@ -82,7 +75,7 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         try
         {
             var httpClient = fac.CreateClient(NAME);
-            var response = await httpClient.GetAsync($"rest-api/hub/user/list-all");
+            var response = await httpClient.GetAsync($"{HUBINFO}/user/list-all");
 
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadFromJsonAsync<List<UserSession>>();
@@ -98,13 +91,14 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
 
     #endregion
 
-    #region /info
+    #region /app-info
+    public const string APPINFO = "app-info";
     public async Task<object> GetAiRuntimeInfoAsync()
     {
         try
         {
             var httpClient = fac.CreateClient(NAME);
-            var response = await httpClient.GetAsync($"rest-api/info/get-ai-runtime-info");
+            var response = await httpClient.GetAsync($"{APPINFO}/get-ai-runtime-info");
 
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadFromJsonAsync<object>();
