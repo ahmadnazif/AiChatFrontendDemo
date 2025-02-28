@@ -7,6 +7,7 @@ using AiChatFrontend.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Sotsera.Blazor.Toaster.Core.Models;
+using Toolbelt.Blazor.Extensions.DependencyInjection;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 var config = builder.Configuration;
@@ -36,10 +37,14 @@ builder.Services.AddToaster(new ToasterConfiguration
 //    client.BaseAddress = new Uri(config["ApiUrl"]);
 //});
 
+builder.Services.AddLoadingBarService();
+
 builder.Services.AddHttpClient(nameof(ApiClient), (sp, client) =>
 {
     client.BaseAddress = new Uri(config["ApiUrl"]);
+    client.EnableIntercept(sp);
 });
 builder.Services.AddScoped<ApiClient>();
 
+builder.UseLoadingBar();
 await builder.Build().RunAsync();
