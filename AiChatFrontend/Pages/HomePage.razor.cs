@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace AiChatFrontend.Pages;
 
-public class HomeBase : ComponentBase
+public class HomePageBase : ComponentBase
 {
     [Inject] public ApiClient Api { get; set; }
     [Inject] public IToaster Toastr { get; set; }
