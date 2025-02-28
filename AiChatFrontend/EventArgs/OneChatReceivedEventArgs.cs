@@ -1,6 +1,6 @@
 ﻿namespace AiChatFrontend.EventArgs;
 
-public class OneChatReceivedEventArgs(OneChatResponse response) : System.EventArgs
+public class OneChatReceivedEventArgs(SingleChatResponse response) : System.EventArgs
 {
-    public OneChatResponse Response { get; set; } = response;
+    public SingleChatResponse Response { get; set; } = response;
 }

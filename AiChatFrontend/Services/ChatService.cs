@@ -52,7 +52,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
             return Task.CompletedTask;
         };
 
-        hubConnection.On<OneChatResponse>("OnReceivedOne", response => OnOneChatReceived?.Invoke(this, new OneChatReceivedEventArgs(response)));
+        hubConnection.On<SingleChatResponse>("OnReceivedOne", response => OnOneChatReceived?.Invoke(this, new OneChatReceivedEventArgs(response)));
         hubConnection.On<ChainedChatResponse>("OnReceivedChained", response => OnChainedChatReceived?.Invoke(this, new ChainedChatReceivedEventArgs(response)));
 
         await hubConnection.StartAsync();
