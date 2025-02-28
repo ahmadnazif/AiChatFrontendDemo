@@ -66,7 +66,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     /// <returns></returns>
     public async Task SendOneAsync(string message)
     {
-        OneChatRequest req = new()
+        SingleChatRequest req = new()
         {
             Message = new(ChatSender.User, message)
         };
