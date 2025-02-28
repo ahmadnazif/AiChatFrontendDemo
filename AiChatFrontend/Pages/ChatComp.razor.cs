@@ -53,7 +53,7 @@ public class ChatCompBase : ComponentBase, IAsyncDisposable
             switch (PageType)
             {
                 case ChatPageType.ChainedChat: Chat.OnChainedChatReceived += this.OnChainedChatReceived; break;
-                case ChatPageType.FireAndForget: Chat.OnSingleChatReceived += this.OnOneChatReceived; break;
+                case ChatPageType.SingleChat: Chat.OnSingleChatReceived += this.OnOneChatReceived; break;
             }
 
             IsChatting = true;
@@ -131,7 +131,7 @@ public class ChatCompBase : ComponentBase, IAsyncDisposable
             switch (PageType)
             {
                 case ChatPageType.ChainedChat: await Chat.SendChainedAsync(NewMessage, prev); break;
-                case ChatPageType.FireAndForget: await Chat.SendOneAsync(NewMessage); break;
+                case ChatPageType.SingleChat: await Chat.SendOneAsync(NewMessage); break;
             }
 
             Log($"[SENT] {UserSession.Username}: {NewMessage}");

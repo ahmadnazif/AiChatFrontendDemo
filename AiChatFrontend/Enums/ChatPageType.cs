@@ -2,6 +2,6 @@
 
 public enum ChatPageType
 {
-    FireAndForget,
+    SingleChat,
     ChainedChat
 }
