@@ -1,6 +1,8 @@
 # AI Chat Frontend Demo
 This is a Blazor WebAssembly standalone app, that connected to AI Chat Backend app that serves as simple generative AI chat client. The real-time chat functionalities is powered by SignalR with fast binary MsgPack serialiation protocol
 
+> Go to the [backend app](https://github.com/ahmadnazif/AiChatBackendDemo)
+
 ## Running the app
 - .NET 8 SDK must be installed to debug the code. 
 - Pull the source code, then open it using Visual Studio 2022.
