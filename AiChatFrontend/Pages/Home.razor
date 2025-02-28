@@ -1,7 +1,5 @@
 ﻿@page "/"
-@using System.Diagnostics;
-@inject AiChatFrontend.Services.ApiClient Api
-@inject IToaster Toastr
+@inherits HomeBase
 
 <PageTitle>Home</PageTitle>
 
@@ -11,25 +9,3 @@
 <pre>
 @Result
 </pre>
-
-@code{
-
-    private object Result { get; set; }
-    private JsonSerializerOptions opt = new() { WriteIndented = true };
-
-    protected override async Task OnInitializedAsync()
-    {
-        await RefreshAsync();
-    }
-
-    private async Task RefreshAsync(bool showToastr = false)
-    {
-        Stopwatch sw = Stopwatch.StartNew();
-        var result = await Api.GetAiRuntimeInfoAsync();
-        Result = JsonSerializer.Serialize(result, opt);
-        sw.Stop();
-
-        if (showToastr)
-            Toastr.Success($"Refreshed [{sw.Elapsed}]");
-    }
-}
