@@ -52,8 +52,8 @@ public class ChatCompBase : ComponentBase, IAsyncDisposable
 
             switch (PageType)
             {
-                case ChatPageType.ChainedChat: Chat.OnChainedChatReceived += this.OnChainedChatReceived; break;
-                case ChatPageType.SingleChat: Chat.OnSingleChatReceived += this.OnOneChatReceived; break;
+                case ChatPageType.ChainedChat: Chat.OnChainedChatReceived += OnChainedChatReceived; break;
+                case ChatPageType.SingleChat: Chat.OnSingleChatReceived += OnSingleChatReceived; break;
             }
 
             IsChatting = true;
@@ -89,7 +89,7 @@ public class ChatCompBase : ComponentBase, IAsyncDisposable
         StateHasChanged();
     }
 
-    private void OnOneChatReceived(object sender, SingleChatReceivedEventArgs e)
+    private void OnSingleChatReceived(object sender, SingleChatReceivedEventArgs e)
     {
         if (e.Response == null)
         {
@@ -104,7 +104,7 @@ public class ChatCompBase : ComponentBase, IAsyncDisposable
         {
             Username = resp.Username,
             ConnectionId = resp.ConnectionId,
-            Message = resp.ResponseMessage, //new(ChatSender.Assistant, resp.ResponseMessage),
+            Message = resp.ResponseMessage,
             SentTime = DateTime.Now,
             Duration = resp.Duration.ToString(),
             ModelId = resp.ModelId
@@ -131,7 +131,7 @@ public class ChatCompBase : ComponentBase, IAsyncDisposable
             switch (PageType)
             {
                 case ChatPageType.ChainedChat: await Chat.SendChainedAsync(NewMessage, prev); break;
-                case ChatPageType.SingleChat: await Chat.SendOneAsync(NewMessage); break;
+                case ChatPageType.SingleChat: await Chat.SendSingleAsync(NewMessage); break;
             }
 
             Log($"[SENT] {UserSession.Username}: {NewMessage}");
