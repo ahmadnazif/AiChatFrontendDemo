@@ -31,9 +31,15 @@ builder.Services.AddToaster(new ToasterConfiguration
     MaxDisplayedToasts = 3
 });
 
-builder.Services.AddHttpClient<ApiClient>((sp, client) =>
+//builder.Services.AddHttpClient<ApiClient>((sp, client) =>
+//{
+//    client.BaseAddress = new Uri(config["ApiUrl"]);
+//});
+
+builder.Services.AddHttpClient(nameof(ApiClient), (sp, client) =>
 {
     client.BaseAddress = new Uri(config["ApiUrl"]);
 });
+builder.Services.AddScoped<ApiClient>();
 
 await builder.Build().RunAsync();

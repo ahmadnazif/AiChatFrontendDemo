@@ -1,25 +1,30 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Xml.Linq;
 
 namespace AiChatFrontend.Services;
 
-public class ApiClient
+public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
 {
-    private readonly HttpClient httpClient;
+    private const string NAME = nameof(ApiClient);
+    private readonly ILogger<ApiClient> logger = logger;
+    private readonly IHttpClientFactory fac = fac;
+    //private readonly HttpClient httpClient;
 
-    public ApiClient(HttpClient httpClient)
-    {
-        httpClient.DefaultRequestHeaders.Accept.Clear();
-        httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        this.httpClient = httpClient;
-    }
+    //public ApiClient(HttpClient httpClient)
+    //{
+    //    httpClient.DefaultRequestHeaders.Accept.Clear();
+    //    httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+    //    this.httpClient = httpClient;
+    //}
 
     #region /hub
     public async Task<bool> IsUserRegisteredAsync(string username)
     {
         try
         {
+            var httpClient = fac.CreateClient(NAME);
             var response = await httpClient.GetAsync($"rest-api/hub/user/is-username-registered?username={username}");
 
             if (response.IsSuccessStatusCode)
@@ -27,8 +32,9 @@ public class ApiClient
             else
                 return false;
         }
-        catch
+        catch(Exception ex)
         {
+            logger.LogError(ex.Message);
             return false;
         }
     }
@@ -37,6 +43,7 @@ public class ApiClient
     {
         try
         {
+            var httpClient = fac.CreateClient(NAME);
             var response = await httpClient.GetAsync($"rest-api/hub/user/is-connection-id-active?connectionId={connectionId}");
 
             if (response.IsSuccessStatusCode)
@@ -44,8 +51,9 @@ public class ApiClient
             else
                 return false;
         }
-        catch
+        catch(Exception ex)
         {
+            logger.LogError(ex.Message);
             return false;
         }
     }
@@ -54,6 +62,7 @@ public class ApiClient
     {
         try
         {
+            var httpClient = fac.CreateClient(NAME);
             var response = await httpClient.GetAsync($"rest-api/hub/user/get-by-username?username={username}");
 
             if (response.IsSuccessStatusCode)
@@ -61,8 +70,9 @@ public class ApiClient
             else
                 return null;
         }
-        catch
+        catch(Exception ex)
         {
+            logger.LogError(ex.Message);
             return null;
         }
     }
@@ -71,16 +81,18 @@ public class ApiClient
     {
         try
         {
+            var httpClient = fac.CreateClient(NAME);
             var response = await httpClient.GetAsync($"rest-api/hub/user/list-all");
 
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadFromJsonAsync<List<UserSession>>();
             else
-                return new();
+                return [];
         }
-        catch
+        catch(Exception ex)
         {
-            return new();
+            logger.LogError(ex.Message);
+            return [];
         }
     }
 
@@ -91,6 +103,7 @@ public class ApiClient
     {
         try
         {
+            var httpClient = fac.CreateClient(NAME);
             var response = await httpClient.GetAsync($"rest-api/info/get-ai-runtime-info");
 
             if (response.IsSuccessStatusCode)
@@ -100,6 +113,7 @@ public class ApiClient
         }
         catch (Exception ex)
         {
+            logger.LogError(ex.Message);
             return new { Exception = $"Exception: {ex.Message}" };
         }
     }
