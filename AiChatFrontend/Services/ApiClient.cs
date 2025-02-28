@@ -7,7 +7,6 @@ namespace AiChatFrontend.Services;
 public class ApiClient
 {
     private readonly HttpClient httpClient;
-    private readonly JsonSerializerOptions JSON_OPT = new() { PropertyNameCaseInsensitive = true };
 
     public ApiClient(HttpClient httpClient)
     {
@@ -101,7 +100,7 @@ public class ApiClient
         }
         catch (Exception ex)
         {
-            return new { Exception = ex.Message };
+            return new { Exception = $"Exception: {ex.Message}" };
         }
     }
     #endregion

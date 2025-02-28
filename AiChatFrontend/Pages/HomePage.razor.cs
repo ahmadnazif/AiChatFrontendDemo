@@ -19,7 +19,7 @@ public class HomePageBase : ComponentBase
 
     protected async Task RefreshAsync(bool showToastr = false)
     {
-        Result = new { Status = "Please wait" };
+        Result = new { Status = "Checking backend API.." };
 
         Stopwatch sw = Stopwatch.StartNew();
         var result = await Api.GetAiRuntimeInfoAsync();
