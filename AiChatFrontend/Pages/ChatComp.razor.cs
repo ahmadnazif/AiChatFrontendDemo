@@ -89,7 +89,7 @@ public class ChatCompBase : ComponentBase, IAsyncDisposable
         StateHasChanged();
     }
 
-    private void OnOneChatReceived(object sender, OneChatReceivedEventArgs e)
+    private void OnOneChatReceived(object sender, SingleChatReceivedEventArgs e)
     {
         if (e.Response == null)
         {

@@ -2,5 +2,5 @@
 
 namespace AiChatFrontend.EventHandlers;
 
-public delegate void SingleChatReceivedEventHandler(object sender, OneChatReceivedEventArgs e);
+public delegate void SingleChatReceivedEventHandler(object sender, SingleChatReceivedEventArgs e);
 
