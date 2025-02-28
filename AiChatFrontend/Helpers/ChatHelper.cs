@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Markdig.Parsers;
+using Microsoft.AspNetCore.Components;
+using System.Text.RegularExpressions;
 
 namespace AiChatFrontend.Helpers;
 
@@ -43,7 +45,9 @@ public static class ChatHelper
 
     public static MarkupString GetMessageText(ChatLog log)
     {
-        return new(log.Message.Text);
+        var unescape = Regex.Unescape(log.Message.Text);
+        var text = MarkdownHelper.ConvertToHtml(unescape);
+        return new(text);
     }
 
     public static string GetChatFooter(ChatLog msg)
