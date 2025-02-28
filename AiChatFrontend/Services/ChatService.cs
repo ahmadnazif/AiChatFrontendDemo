@@ -11,8 +11,6 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     private readonly ILogger<ChatService> logger = logger;
     private HubConnection hubConnection;
 
-    public bool IsConnected { get; set; }
-
     /// <summary>
     /// Occured when single message received
     /// </summary>
@@ -33,19 +31,16 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
         hubConnection = HubHelper.CreateHubConnection(config, "/chat-hub", username, false);
         hubConnection.Closed += (e) =>
         {
-            IsConnected = false;
             LogConnectionState();
             return Task.CompletedTask;
         };
         hubConnection.Reconnected += (e) =>
         {
-            IsConnected = true;
             LogConnectionState();
             return Task.CompletedTask;
         };
         hubConnection.Reconnecting += (e) =>
         {
-            IsConnected = true;
             LogConnectionState();
             return Task.CompletedTask;
         };
@@ -54,7 +49,6 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
         hubConnection.On<ChainedChatResponse>("OnReceivedChained", response => OnChainedChatReceived?.Invoke(this, new ChainedChatReceivedEventArgs(response)));
 
         await hubConnection.StartAsync();
-        IsConnected = true;
     }
 
     /// <summary>
@@ -113,7 +107,6 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
         await hubConnection.DisposeAsync();
         LogConnectionState();
         hubConnection = null;
-        IsConnected = false;
     }
 
     private void LogConnectionState()
