@@ -11,6 +11,25 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
     private readonly ILogger<ApiClient> logger = logger;
     private readonly IHttpClientFactory fac = fac;
 
+    #region Check Backend API
+    public async Task<bool> IsConnectedAsync()
+    {
+        try
+        {
+            var httpClient = fac.CreateClient(NAME);
+            httpClient.Timeout = TimeSpan.FromSeconds(3);
+            var response = await httpClient.GetAsync($"/");
+
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.Message);
+            return false;
+        }
+    }
+    #endregion
+
     #region /hub-info
     public const string HUBINFO = "hub-info";
     public async Task<bool> IsUserRegisteredAsync(string username)
@@ -25,7 +44,7 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
             else
                 return false;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             logger.LogError(ex.Message);
             return false;
@@ -44,7 +63,7 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
             else
                 return false;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             logger.LogError(ex.Message);
             return false;
@@ -63,7 +82,7 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
             else
                 return null;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             logger.LogError(ex.Message);
             return null;
@@ -82,7 +101,7 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
             else
                 return [];
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             logger.LogError(ex.Message);
             return [];

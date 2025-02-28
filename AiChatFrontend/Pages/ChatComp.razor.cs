@@ -13,6 +13,7 @@ public class ChatCompBase : ComponentBase, IAsyncDisposable
     [Inject] public NavigationManager NavMan { get; set; }
     [Inject] public ChatService Chat { get; set; }
     [Inject] public ApiClient Api { get; set; }
+    protected bool IsApiConnected { get; set; }
     protected bool IsChatting { get; set; } = false;
     protected bool IsWaitingResponse { get; set; } = false;
     protected string Username { get; set; }
@@ -20,6 +21,8 @@ public class ChatCompBase : ComponentBase, IAsyncDisposable
     protected string ConnectionId { get; set; }
     protected string NewMessage { get; set; }
     protected List<ChatLog> ChatLogs { get; set; } = [];
+
+    protected override async Task OnParametersSetAsync() => IsApiConnected = await Api.IsConnectedAsync();
 
     protected async Task ReconnectAsync()
     {
