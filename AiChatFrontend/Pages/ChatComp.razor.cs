@@ -71,7 +71,7 @@ public class ChatCompBase : ComponentBase, IAsyncDisposable
     {
         if (e.Response == null)
         {
-            LogError("e.Response is NULL");
+            LogError($"{nameof(e.Response)} is NULL");
             return;
         }
 
@@ -96,7 +96,7 @@ public class ChatCompBase : ComponentBase, IAsyncDisposable
     {
         if (e.Response == null)
         {
-            LogError("e.Response is NULL");
+            LogError($"{nameof(e.Response)} is NULL");
             return;
         }
 

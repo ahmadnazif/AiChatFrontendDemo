@@ -18,7 +18,7 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         {
             var httpClient = fac.CreateClient(NAME);
             httpClient.Timeout = TimeSpan.FromSeconds(3);
-            var response = await httpClient.GetAsync($"/");
+            var response = await httpClient.GetAsync($"/swagger/index.html");
 
             return response.IsSuccessStatusCode;
         }
@@ -127,7 +127,7 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         catch (Exception ex)
         {
             logger.LogError(ex.Message);
-            return new { Exception = $"Exception: {ex.Message}" };
+            return new { Exception = $"{ex.Message}" };
         }
     }
     #endregion
