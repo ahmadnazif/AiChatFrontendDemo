@@ -20,9 +20,9 @@ else
     else
     {
         <label>Please enter your username to start:</label>
-        <div class="col-sm-6">
+        <div class="col-sm-4">
             <div class="input-group">
-                <input class="form-control" type="text" @bind="Username" />
+                <input class="form-control" type="text" placeholder="Enter username" @bind="Username" />
                 <button class="btn btn-success btn-sm" @onclick="async () => await StartAsync()">Enter Chat</button>
             </div>
         </div>
@@ -35,25 +35,35 @@ else
         }
     }
 
-    <br />
 
     <div class="content px-4">
-
         @if (IsChatting)
         {
             <div id="scrollbox">
-                @foreach (var item in ChatLogs)
+                <hr />
+                @if (ChatLogs.Count == 0)
                 {
-                    <div class="@ChatHelper.GetChatCss(item)">
-                        <div class="user">@ChatHelper.GetUsername(item)</div>
-                        <div class="msg">@ChatHelper.GetMessageText(item)</div>
-                        <font size="1">@ChatHelper.GetChatFooter(item)</font>
+                    <div class="alert alert-success">
+                        <div class="text-center">
+                            Start your chat by entering your message below, then hit "Send Message"
+                        </div>
                     </div>
+                }
+                else
+                {
+                    @foreach (var item in ChatLogs)
+                    {
+                        <div class="@ChatHelper.GetChatCss(item)">
+                            <div class="user">@ChatHelper.GetUsername(item)</div>
+                            <div class="markdown-content">@ChatHelper.GetMessageText(item)</div>
+                            <font size="1">@ChatHelper.GetChatFooter(item)</font>
+                        </div>
+                    }
                 }
                 <hr />
                 <div class="input-group">
-                    <textarea class="form-control" rows="2" style="resize:none" placeholder="Enter you message" @bind="@NewMessage"></textarea>
-                    <button class="btn btn-sm btn-success" disabled="@IsWaitingResponse" @onclick="async () => await SendAsync()"><span class="oi oi-location"></span> Send</button>
+                    <textarea class="form-control" rows="4" style="resize:none" placeholder="Enter you message" @bind="@NewMessage"></textarea>
+                    <button class="btn btn-sm btn-success" disabled="@IsWaitingResponse" @onclick="async () => await SendAsync()"><span class="oi oi-location"></span> Send<br />Message</button>
                 </div>
             </div>
         }
@@ -63,4 +73,6 @@ else
         }
 
     </div>
+    <br />
+    <br />
 }

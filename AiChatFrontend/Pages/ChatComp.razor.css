@@ -65,3 +65,29 @@ textarea {
 .msg {
     /*display: inline;*/
 }
+
+/* General Markdown styling */
+.markdown-content {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+    /* Style code blocks */
+    .markdown-content pre {
+        background-color: #282c34; /* Dark background */
+        color: #ffffff; /* Light text */
+        padding: 12px;
+        border-radius: 8px;
+        overflow-x: auto;
+        font-family: "Courier New", monospace;
+    }
+
+    /* Inline code styling */
+    .markdown-content code {
+        background-color: #f4f4f4;
+        color: #c7254e;
+        padding: 2px 5px;
+        border-radius: 4px;
+        font-family: "Courier New", monospace;
+    }
+

@@ -17,7 +17,7 @@ public static class ChatHelper
     {
         List<ChatMsg> list = [];
 
-        foreach(var m in logs)
+        foreach (var m in logs)
             list.Add(m.Message);
 
         return list;
