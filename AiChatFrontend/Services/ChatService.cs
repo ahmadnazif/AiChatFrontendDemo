@@ -7,10 +7,9 @@ namespace AiChatFrontend.Services;
 
 public class ChatService(IConfiguration config, ILogger<ChatService> logger) : IAsyncDisposable
 {
-    public const string HUBURL = "/chat-hub";
-    private HubConnection hubConnection;
     private readonly IConfiguration config = config;
     private readonly ILogger<ChatService> logger = logger;
+    private HubConnection hubConnection;
 
     public bool IsConnected { get; set; }
 
@@ -31,9 +30,6 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     /// <returns></returns>
     public async Task ConnectAsync(string username)
     {
-        //var hubUrl = $"{config["ApiUrl"].TrimEnd('/')}{HUBURL}?username={username}";
-        //hubConnection = new HubConnectionBuilder().WithUrl(hubUrl).WithAutomaticReconnect().AddMessagePackProtocol().Build();
-
         hubConnection = HubHelper.CreateHubConnection(config, "/chat-hub", username, false);
         hubConnection.Closed += (e) =>
         {
