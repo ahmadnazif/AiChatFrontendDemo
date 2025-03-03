@@ -69,7 +69,6 @@ else
                 }
                 else
                 {
-                    <small class="text-muted">@ResponseText</small>
                     @foreach (var item in ChatLogs)
                     {
                         <div class="@ChatHelper.GetChatCss(item)">
@@ -78,6 +77,9 @@ else
                             <font size="1">@ChatHelper.GetChatFooter(item)</font>
                         </div>
                     }
+                    <div class="alert alert-secondary">
+                        <small class="text-muted">@AppendedText</small>
+                    </div>
                 }
                 <hr />
                 <div class="input-group">

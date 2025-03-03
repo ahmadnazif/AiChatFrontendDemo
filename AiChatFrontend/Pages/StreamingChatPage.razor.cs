@@ -15,7 +15,7 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
     protected bool IsApiConnected { get; set; }
     protected bool IsChatting { get; set; } = false;
     protected bool IsWaitingResponse { get; set; } = false;
-    protected string? ResponseText { get; set; }
+    protected string? AppendedText { get; set; }
     protected string Username { get; set; }
     protected UserSession UserSession { get; set; }
     protected string ConnectionId { get; set; }
@@ -66,16 +66,33 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
         }
     }
 
+    //private void OnStreamingChatReceived(object sender, StreamingChatReceivedEventArgs e)
+    //{
+    //    var resp = e.Response;
+    //    AppendedText += resp.Message.Text;
+
+    //    if (resp.HasFinished)
+    //    {
+    //        var last = ChatHelper.BuildLastChatLog(ConnectionId, Username, AppendedText, resp);
+    //        ChatLogs.Add(last);
+    //        AppendedText = string.Empty;
+    //        IsWaitingResponse = false;
+    //        Toastr.Info($"Finished at {DateTime.Now.ToLongTimeString()}");
+    //    }
+
+    //    StateHasChanged();
+    //}
+
     private void OnStreamingChatReceived(object sender, StreamingChatReceivedEventArgs e)
     {
         var resp = e.Response;
-        ResponseText += resp.Text;
+        AppendedText += resp.Message.Text;
 
         if (resp.HasFinished)
         {
-            var last = ChatHelper.BuildLastChatLog(ConnectionId, Username, ResponseText, resp);
+            var last = ChatHelper.BuildLastChatLog(ConnectionId, Username, AppendedText, resp);
             ChatLogs.Add(last);
-            ResponseText = string.Empty;
+            AppendedText = string.Empty;
             IsWaitingResponse = false;
             Toastr.Info($"Finished at {DateTime.Now.ToLongTimeString()}");
         }
