@@ -15,6 +15,7 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
     protected bool IsApiConnected { get; set; }
     protected bool IsChatting { get; set; } = false;
     protected bool IsWaitingResponse { get; set; } = false;
+    protected string StreamingId { get; set; }
     protected string? AppendedText { get; set; }
     protected string Username { get; set; }
     protected UserSession UserSession { get; set; }
