@@ -2,6 +2,7 @@
 using AiChatFrontend.Services;
 using Microsoft.AspNetCore.Components;
 using Sotsera.Blazor.Toaster;
+using System.Diagnostics;
 
 namespace AiChatFrontend.Pages;
 
@@ -16,6 +17,7 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
     protected bool IsChatting { get; set; } = false;
     protected bool IsWaitingResponse { get; set; } = false;
     protected string StreamingId { get; set; }
+    protected Stopwatch StreamingSw { get; set; } = new Stopwatch();
     protected string? AppendedText { get; set; }
     protected string Username { get; set; }
     protected UserSession UserSession { get; set; }
@@ -91,12 +93,14 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
         if (StreamingId != resp.StreamingId)
         {
             StreamingId = resp.StreamingId;
-            var first = ChatHelper.BuildChatLog(ConnectionId, Username, AppendedText, resp);
+            StreamingSw.Start();
+
+            var first = ChatHelper.BuildChatLog(ConnectionId, Username, AppendedText, resp, StreamingSw);
             ChatLogs.Add(resp.StreamingId, first);
         }
 
         AppendedText += resp.Message.Text;
-        var last = ChatHelper.BuildChatLog(ConnectionId, Username, AppendedText, resp);
+        var last = ChatHelper.BuildChatLog(ConnectionId, Username, AppendedText, resp, StreamingSw);
         if(ChatLogs.TryGetValue(StreamingId, out var _))
         {
             ChatLogs[StreamingId] = last;
@@ -104,6 +108,7 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
 
         if (resp.HasFinished)
         {
+            StreamingSw.Stop();
             AppendedText = string.Empty;
             IsWaitingResponse = false;
             Toastr.Info($"Finished at {DateTime.Now.ToLongTimeString()}");

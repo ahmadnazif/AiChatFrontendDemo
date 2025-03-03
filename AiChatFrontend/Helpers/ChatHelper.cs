@@ -1,5 +1,6 @@
 ﻿using Markdig.Parsers;
 using Microsoft.AspNetCore.Components;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace AiChatFrontend.Helpers;
@@ -23,13 +24,13 @@ public static class ChatHelper
         return list;
     }
 
-    public static ChatLog BuildChatLog(string connectionId, string username, string appendedText, StreamingChatResponse last)
+    public static ChatLog BuildChatLog(string connectionId, string username, string appendedText, StreamingChatResponse last, Stopwatch sw)
     {
         return new()
         {
             ConnectionId = connectionId,
             Username = username,
-            Duration = "Todo",
+            Duration = sw.Elapsed.ToString(),
             Message = new(last.Message.Sender, appendedText + last.Message.Text),
             ModelId = last.ModelId,
             SentTime = last.CreatedAt.LocalDateTime
@@ -76,9 +77,10 @@ public static class ChatHelper
     public static string GetChatFooter(KeyValuePair<string, ChatLog> msg)
     {
         var val = msg.Value;
+        var duration = string.IsNullOrWhiteSpace(msg.Value.Duration) ? "receiving.." : msg.Value.Duration;
         return val.Message.Sender switch
         {
-            ChatSender.Assistant => $"{val.SentTime.ToLongTimeString()}  |  Time taken: {val.Duration}  |  Model: {val.ModelId} [{msg.Key}]",
+            ChatSender.Assistant => $"{val.SentTime.ToLongTimeString()}  |  Duration: {duration}  |  Model: {val.ModelId} | Streaming ID: {msg.Key}]",
             ChatSender.User => $"{val.SentTime.ToLongTimeString()} [{msg.Key}]",
             _ => string.Empty,
         };
