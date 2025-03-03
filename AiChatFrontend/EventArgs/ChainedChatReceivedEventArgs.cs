@@ -6,8 +6,8 @@ public class ChainedChatReceivedEventArgs(ChainedChatResponse response) : System
 }
 
 // TODO: move out
-public class StreamingChatReceivedEventArgs(string response) : System.EventArgs
+public class StreamingChatReceivedEventArgs(StreamingChatResponse response) : System.EventArgs
 {
-    public string? Response { get; set; } = response;
+    public StreamingChatResponse Response { get; set; } = response;
 }
 

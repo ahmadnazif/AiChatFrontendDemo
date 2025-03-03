@@ -111,7 +111,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
         };
 
         logger.LogInformation("Streaming started");
-        await foreach(var resp in hubConnection.StreamAsync<string>("StreamChatTextAsync", req, cts.Token))
+        await foreach(var resp in hubConnection.StreamAsync<StreamingChatResponse>("StreamChatAsync", req, cts.Token))
         {
             OnStreamingChatReceived?.Invoke(this, new StreamingChatReceivedEventArgs(resp));
         }

@@ -69,7 +69,7 @@ public class StreamingChatBase : ComponentBase, IAsyncDisposable
 
     private void OnStreamingChatReceived(object sender, StreamingChatReceivedEventArgs e)
     {
-        ResponseText += e.Response;
+        ResponseText += e.Response.Text;
         StateHasChanged();
     }
 
