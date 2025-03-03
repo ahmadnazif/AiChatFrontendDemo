@@ -63,7 +63,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     {
         SingleChatRequest req = new()
         {
-            Message = new(ChatSender.User, message)
+            Prompt = new(ChatSender.User, message)
         };
 
         try
