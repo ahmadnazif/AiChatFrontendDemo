@@ -10,6 +10,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     private readonly IConfiguration config = config;
     private readonly ILogger<ChatService> logger = logger;
     private HubConnection hubConnection;
+    private CancellationTokenSource cts;
 
     /// <summary>
     /// Occured when single message received
@@ -20,6 +21,8 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     /// Occured when single message with chained previous message received
     /// </summary>
     public event ChainedChatReceivedEventHandler OnChainedChatReceived;
+
+    public event StreamingChatReceivedEventHandler OnStreamingChatReceived;
 
     /// <summary>
     /// Start the connection with username
@@ -99,15 +102,17 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
 
     public async Task StreamChatAsync(string message, List<ChatMsg> previousMsg)
     {
+        cts = new();
+
         ChainedChatRequest req = new()
         {
             PreviousMessages = previousMsg,
             LatestMessage = new(ChatSender.User, message)
         };
 
-        await foreach(var resp in hubConnection.StreamAsync<string>("ChatStreamDemoAsync", req))
+        await foreach(var resp in hubConnection.StreamAsync<string>("ChatStreamDemoAsync", req, cts.Token))
         {
-
+            OnStreamingChatReceived?.Invoke(this, new StreamingChatReceivedEventArgs(resp));
         }
     }
 
