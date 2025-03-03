@@ -21,7 +21,7 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
     protected UserSession UserSession { get; set; }
     protected string ConnectionId { get; set; }
     protected string NewMessage { get; set; }
-    protected List<ChatLog> ChatLogs { get; set; } = [];
+    protected Dictionary<string, ChatLog> ChatLogs { get; set; } = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -87,12 +87,23 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
     private void OnStreamingChatReceived(object sender, StreamingChatReceivedEventArgs e)
     {
         var resp = e.Response;
+
+        if (StreamingId != resp.StreamingId)
+        {
+            StreamingId = resp.StreamingId;
+            var first = ChatHelper.BuildLastChatLog(ConnectionId, Username, AppendedText, resp);
+            ChatLogs.Add(resp.StreamingId, first);
+        }
+
         AppendedText += resp.Message.Text;
+        var last = ChatHelper.BuildLastChatLog(ConnectionId, Username, AppendedText, resp);
+        if(ChatLogs.TryGetValue(StreamingId, out var _))
+        {
+            ChatLogs[StreamingId] = last;
+        }
 
         if (resp.HasFinished)
         {
-            var last = ChatHelper.BuildLastChatLog(ConnectionId, Username, AppendedText, resp);
-            ChatLogs.Add(last);
             AppendedText = string.Empty;
             IsWaitingResponse = false;
             Toastr.Info($"Finished at {DateTime.Now.ToLongTimeString()}");
@@ -105,7 +116,8 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
     {
         if (IsChatting && !string.IsNullOrWhiteSpace(NewMessage))
         {
-            ChatLogs.Add(new()
+            var id = Guid.NewGuid().ToString("N").ToUpper();
+            ChatLogs.Add(id, new()
             {
                 ConnectionId = UserSession.ConnectionId,
                 Username = UserSession.Username,
@@ -113,7 +125,7 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
                 SentTime = DateTime.Now
             });
 
-            var prev = ChatHelper.BuildPreviousMessages(ChatLogs);
+            var prev = ChatHelper.BuildPreviousMessages([.. ChatLogs.Values]);
 
             IsWaitingResponse = true;
             await Chat.StartChatStreamingAsync(NewMessage, prev);

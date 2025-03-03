@@ -72,4 +72,15 @@ public static class ChatHelper
             _ => string.Empty,
         };
     }
+
+    public static string GetChatFooter(KeyValuePair<string, ChatLog> msg)
+    {
+        var val = msg.Value;
+        return val.Message.Sender switch
+        {
+            ChatSender.Assistant => $"{val.SentTime.ToLongTimeString()}  |  Time taken: {val.Duration}  |  Model: {val.ModelId} [{msg.Key}]",
+            ChatSender.User => $"{val.SentTime.ToLongTimeString()} [{msg.Key}]",
+            _ => string.Empty,
+        };
+    }
 }

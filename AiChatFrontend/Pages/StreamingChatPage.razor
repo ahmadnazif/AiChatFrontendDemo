@@ -71,9 +71,9 @@ else
                 {
                     @foreach (var item in ChatLogs)
                     {
-                        <div class="@ChatHelper.GetChatCss(item)">
-                            <div class="user">@ChatHelper.GetUsername(item)</div>
-                            <div class="markdown-content">@ChatHelper.GetMessageText(item)</div>
+                        <div class="@ChatHelper.GetChatCss(item.Value)">
+                            <div class="user">@ChatHelper.GetUsername(item.Value)</div>
+                            <div class="markdown-content">@ChatHelper.GetMessageText(item.Value)</div>
                             <font size="1">@ChatHelper.GetChatFooter(item)</font>
                         </div>
                     }
