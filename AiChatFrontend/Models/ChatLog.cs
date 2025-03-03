@@ -11,3 +11,8 @@ public class ChatLog
     public ChatMsg Message { get; set; }
     public DateTime SentTime { get; set; }
 }
+
+public class ChatLogStream
+{
+    public ChatMsg Message { get; set; }
+}

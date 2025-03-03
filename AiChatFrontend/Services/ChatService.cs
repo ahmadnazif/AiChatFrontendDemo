@@ -100,7 +100,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
         }
     }
 
-    public async Task BeginChatStreamingAsync(string message, List<ChatMsg> previousMsg)
+    public async Task StartChatStreamingAsync(string message, List<ChatMsg> previousMsg)
     {
         cts = new();
 
@@ -110,10 +110,17 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
             LatestMessage = new(ChatSender.User, message)
         };
 
+        logger.LogInformation("Streaming started");
         await foreach(var resp in hubConnection.StreamAsync<string>("StreamChatTextAsync", req, cts.Token))
         {
             OnStreamingChatReceived?.Invoke(this, new StreamingChatReceivedEventArgs(resp));
         }
+    }
+
+    public void StopChatStreaming()
+    {
+        cts.Cancel();
+        logger.LogInformation("Streaming stopped");
     }
 
     /// <summary>

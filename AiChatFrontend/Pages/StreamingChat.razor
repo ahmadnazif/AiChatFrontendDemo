@@ -1,7 +1,91 @@
 ﻿@page "/streaming-chat"
+@inherits StreamingChatBase
 
-<h3>StreamingChat</h3>
+@if (!IsApiConnected)
+{
+    <div class="alert alert-danger">
+        Backend API is not connected
+    </div>
+}
+else
+{
+    <h3>Streaming Chat</h3>
 
-@code {
+    @if (IsChatting)
+    {
+        <div>
+            <label><strong>Username</strong>: @Username | <strong>Connection ID:</strong> @UserSession?.ConnectionId | <strong>Started:</strong> @UserSession?.StartTime </label>
+            <button class="btn btn-danger btn-sm float-end" @onclick="async () => await DisconnectAsync()">Disconnect</button>
+        </div>
+    }
+    else
+    {
+        <label>Please enter your username to start:</label>
+        <div class="col-sm-4">
+            <div class="input-group">
+                <input class="form-control" type="text" placeholder="Enter username" @bind="Username" />
+                <button class="btn btn-success btn-sm" @onclick="async () => await StartAsync()">Enter Chat</button>
+            </div>
+        </div>
 
+        @if (!string.IsNullOrWhiteSpace(UserSession?.Username))
+        {
+            <br />
+            <label>Or you can reconnect your last session with user: <strong>@UserSession.Username</strong></label>
+            <button class="btn btn-success btn-sm" @onclick="async () => await ReconnectAsync()">Reconnect</button>
+        }
+    }
+
+    @*<hr />
+        @if (ResponseText is not null)
+        {
+            <p><strong>New Message:</strong> @ResponseText</p>
+        }
+        else
+        {
+            <p>Waiting for messages...</p>
+        }
+
+        <button @onclick="SendAsync" disabled="@IsStreaming">Send Streaming</button>
+        <button @onclick="Stop" disabled="@(!IsStreaming)">Stop Streaming</button>
+        <div class="input-group">
+            <textarea class="form-control" rows="4" style="resize:none" placeholder="Enter you message" @bind="@NewMessage"></textarea>
+            <button class="btn btn-sm btn-success" @onclick="async () => await SendAsync()"><span class="oi oi-location"></span> Send<br />Message</button>
+        </div>
+        <hr />*@
+
+    <div class="content px-4">
+        @if (IsChatting)
+        {
+            <div id="scrollbox">
+                <hr />
+                @if (ChatLogs.Count == 0)
+                {
+                    <div class="alert alert-success">
+                        <div class="text-center">
+                            Start your chat by entering your message below, then hit "Send Message"
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    @foreach (var item in ChatLogs)
+                    {
+                        <div class="@ChatHelper.GetChatCss(item)">
+                            <div class="user">@ChatHelper.GetUsername(item)</div>
+                            <div class="markdown-content">@ChatHelper.GetMessageText(item)</div>
+                            <font size="1">@ChatHelper.GetChatFooter(item)</font>
+                        </div>
+                    }
+                }
+                <hr />
+                <div class="input-group">
+                    <textarea class="form-control" rows="4" style="resize:none" placeholder="Enter you message" @bind="@NewMessage"></textarea>
+                    <button class="btn btn-sm btn-success" disabled="@IsWaitingResponse" @onclick="async () => await SendAsync()"><span class="oi oi-location"></span> Send<br />Message</button>
+                </div>
+            </div>
+        }
+    </div>
+    <br />
+    <br />
 }
