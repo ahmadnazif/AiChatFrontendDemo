@@ -80,7 +80,7 @@ public static class ChatHelper
         var duration = string.IsNullOrWhiteSpace(msg.Value.Duration) ? "receiving.." : msg.Value.Duration;
         return val.Message.Sender switch
         {
-            ChatSender.Assistant => $"{val.SentTime.ToLongTimeString()}  |  Duration: {duration}  |  Model: {val.ModelId} | Streaming ID: {msg.Key}]",
+            ChatSender.Assistant => $"{val.SentTime.ToLongTimeString()}  |  Duration: {duration}  |  Model: {val.ModelId} | Streaming ID: {msg.Key}",
             ChatSender.User => $"{val.SentTime.ToLongTimeString()} [{msg.Key}]",
             _ => string.Empty,
         };

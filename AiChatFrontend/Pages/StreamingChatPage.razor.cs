@@ -109,6 +109,7 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
         if (resp.HasFinished)
         {
             StreamingSw.Stop();
+            StreamingSw.Reset();
             AppendedText = string.Empty;
             IsStreamingCompleted = true;
             Toastr.Info($"Finished at {DateTime.Now.ToLongTimeString()}");
