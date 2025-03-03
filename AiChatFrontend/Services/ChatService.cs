@@ -87,7 +87,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
         ChainedChatRequest req = new()
         {
             PreviousMessages = previousMsg,
-            LatestMessage = new(ChatSender.User, message)
+            Prompt = new(ChatSender.User, message)
         };
 
         try
@@ -107,7 +107,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
         ChainedChatRequest req = new()
         {
             PreviousMessages = previousMsg,
-            LatestMessage = new(ChatSender.User, message)
+            Prompt = new(ChatSender.User, message)
         };
 
         logger.LogInformation("Streaming started");
