@@ -23,6 +23,19 @@ public static class ChatHelper
         return list;
     }
 
+    public static ChatLog BuildLastChatLog(string connectionId, string username, string text, StreamingChatResponse last)
+    {
+        return new()
+        {
+            ConnectionId = connectionId,
+            Username = username,
+            Duration = "Todo",
+            Message = new(ChatSender.User, text),
+            ModelId = "TODO",
+            SentTime = last.CreatedAt.LocalDateTime
+        };
+    }
+
     public static string GetChatCss(ChatLog log)
     {
         return log.Message.Sender switch

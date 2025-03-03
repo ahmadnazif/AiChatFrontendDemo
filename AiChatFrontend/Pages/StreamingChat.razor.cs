@@ -14,7 +14,6 @@ public class StreamingChatBase : ComponentBase, IAsyncDisposable
     [Inject] public ApiClient Api { get; set; }
     protected bool IsApiConnected { get; set; }
     protected bool IsChatting { get; set; } = false;
-    protected bool IsStreaming { get; set; } = false;
     protected bool IsWaitingResponse { get; set; } = false;
     protected string? ResponseText { get; set; }
     protected string Username { get; set; }
@@ -69,7 +68,18 @@ public class StreamingChatBase : ComponentBase, IAsyncDisposable
 
     private void OnStreamingChatReceived(object sender, StreamingChatReceivedEventArgs e)
     {
-        ResponseText += e.Response.Text;
+        var resp = e.Response;
+        ResponseText += resp.Text;
+
+        if (resp.HasFinished)
+        {
+            var last = ChatHelper.BuildLastChatLog(ConnectionId, Username, ResponseText, resp);
+            ChatLogs.Add(last);
+            ResponseText = string.Empty;
+            IsWaitingResponse = false;
+            Toastr.Info($"Finished at {DateTime.Now.ToLongTimeString()}");
+        }
+
         StateHasChanged();
     }
 
@@ -87,13 +97,13 @@ public class StreamingChatBase : ComponentBase, IAsyncDisposable
 
             var prev = ChatHelper.BuildPreviousMessages(ChatLogs);
 
+            IsWaitingResponse = true;
             await Chat.StartChatStreamingAsync(NewMessage, prev);
 
             Log($"[SENT] {UserSession.Username}: {NewMessage}");
 
             NewMessage = string.Empty;
-            IsWaitingResponse = true;
-            IsStreaming = true;
+            //IsStreaming = true;
         }
     }
 
