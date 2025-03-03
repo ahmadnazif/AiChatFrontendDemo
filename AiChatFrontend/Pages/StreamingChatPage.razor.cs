@@ -5,9 +5,9 @@ using Sotsera.Blazor.Toaster;
 
 namespace AiChatFrontend.Pages;
 
-public class StreamingChatBase : ComponentBase, IAsyncDisposable
+public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
 {
-    [Inject] public ILogger<StreamingChatBase> Logger { get; set; }
+    [Inject] public ILogger<StreamingChatPageBase> Logger { get; set; }
     [Inject] public IToaster Toastr { get; set; }
     [Inject] public NavigationManager NavMan { get; set; }
     [Inject] public ChatService Chat { get; set; }
