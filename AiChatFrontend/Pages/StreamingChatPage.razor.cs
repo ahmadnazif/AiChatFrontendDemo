@@ -15,7 +15,7 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
     [Inject] public ApiClient Api { get; set; }
     protected bool IsApiConnected { get; set; }
     protected bool IsChatting { get; set; } = false;
-    protected bool IsWaitingResponse { get; set; } = false;
+    protected bool IsStreamingCompleted { get; set; } = true;
     protected string StreamingId { get; set; }
     protected Stopwatch StreamingSw { get; set; } = new Stopwatch();
     protected string? AppendedText { get; set; }
@@ -101,7 +101,7 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
 
         AppendedText += resp.Message.Text;
         var last = ChatHelper.BuildChatLog(ConnectionId, Username, AppendedText, resp, StreamingSw);
-        if(ChatLogs.TryGetValue(StreamingId, out var _))
+        if (ChatLogs.TryGetValue(StreamingId, out var _))
         {
             ChatLogs[StreamingId] = last;
         }
@@ -110,7 +110,7 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
         {
             StreamingSw.Stop();
             AppendedText = string.Empty;
-            IsWaitingResponse = false;
+            IsStreamingCompleted = true;
             Toastr.Info($"Finished at {DateTime.Now.ToLongTimeString()}");
         }
 
@@ -119,27 +119,35 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
 
     protected async Task SendAsync()
     {
-        if (IsChatting && !string.IsNullOrWhiteSpace(NewMessage))
+        if (string.IsNullOrWhiteSpace(NewMessage))
         {
-            var id = Guid.NewGuid().ToString("N").ToUpper();
-            ChatLogs.Add(id, new()
-            {
-                ConnectionId = UserSession.ConnectionId,
-                Username = UserSession.Username,
-                Message = new(ChatSender.User, NewMessage),
-                SentTime = DateTime.Now
-            });
-
-            var prev = ChatHelper.BuildPreviousMessages([.. ChatLogs.Values]);
-
-            IsWaitingResponse = true;
-            await Chat.StartChatStreamingAsync(NewMessage, prev);
-
-            Log($"[SENT] {UserSession.Username}: {NewMessage}");
-
-            NewMessage = string.Empty;
-            //IsStreaming = true;
+            Toastr.Warning("Prompt is required.");
+            return;
         }
+
+        if (!IsChatting)
+        {
+            Toastr.Error("Chatting is not initiated");
+            return;
+        }
+
+        var id = Guid.NewGuid().ToString("N").ToUpper();
+        ChatLogs.Add(id, new()
+        {
+            ConnectionId = UserSession.ConnectionId,
+            Username = UserSession.Username,
+            Message = new(ChatSender.User, NewMessage),
+            SentTime = DateTime.Now
+        });
+
+        var prev = ChatHelper.BuildPreviousMessages([.. ChatLogs.Values]);
+
+        IsStreamingCompleted = false;
+        await Chat.StartChatStreamingAsync(NewMessage, prev);
+
+        Log($"[SENT] {UserSession.Username}: {NewMessage}");
+
+        NewMessage = string.Empty;
     }
 
     protected void Stop() => Chat.StopChatStreaming();
