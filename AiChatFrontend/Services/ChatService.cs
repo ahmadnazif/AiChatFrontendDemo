@@ -97,6 +97,20 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
         }
     }
 
+    public async Task StreamChatAsync(string message, List<ChatMsg> previousMsg)
+    {
+        ChainedChatRequest req = new()
+        {
+            PreviousMessages = previousMsg,
+            LatestMessage = new(ChatSender.User, message)
+        };
+
+        await foreach(var resp in hubConnection.StreamAsync<string>("ChatStreamDemoAsync", req))
+        {
+
+        }
+    }
+
     /// <summary>
     /// Stop the connection and dispose the hub
     /// </summary>
