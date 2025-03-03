@@ -23,7 +23,7 @@ public static class ChatHelper
         return list;
     }
 
-    public static ChatLog BuildLastChatLog(string connectionId, string username, string appendedText, StreamingChatResponse last)
+    public static ChatLog BuildChatLog(string connectionId, string username, string appendedText, StreamingChatResponse last)
     {
         return new()
         {

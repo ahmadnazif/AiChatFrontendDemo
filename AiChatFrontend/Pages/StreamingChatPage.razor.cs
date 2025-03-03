@@ -91,12 +91,12 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
         if (StreamingId != resp.StreamingId)
         {
             StreamingId = resp.StreamingId;
-            var first = ChatHelper.BuildLastChatLog(ConnectionId, Username, AppendedText, resp);
+            var first = ChatHelper.BuildChatLog(ConnectionId, Username, AppendedText, resp);
             ChatLogs.Add(resp.StreamingId, first);
         }
 
         AppendedText += resp.Message.Text;
-        var last = ChatHelper.BuildLastChatLog(ConnectionId, Username, AppendedText, resp);
+        var last = ChatHelper.BuildChatLog(ConnectionId, Username, AppendedText, resp);
         if(ChatLogs.TryGetValue(StreamingId, out var _))
         {
             ChatLogs[StreamingId] = last;
