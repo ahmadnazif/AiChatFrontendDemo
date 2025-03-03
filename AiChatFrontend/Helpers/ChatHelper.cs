@@ -31,7 +31,7 @@ public static class ChatHelper
             Username = username,
             Duration = "Todo",
             Message = new(last.Message.Sender, appendedText + last.Message.Text),
-            ModelId = "TODO",
+            ModelId = last.ModelId,
             SentTime = last.CreatedAt.LocalDateTime
         };
     }
