@@ -21,6 +21,9 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     /// </summary>
     public event ChainedChatReceivedEventHandler OnChainedChatReceived;
 
+    /// <summary>
+    /// Occured when message received using streaming
+    /// </summary>
     public event StreamingChatReceivedEventHandler OnStreamingChatReceived;
 
     /// <summary>
