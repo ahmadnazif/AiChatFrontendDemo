@@ -80,7 +80,7 @@ else
                 }
                 <hr />
                 <div class="input-group">
-                    <textarea class="form-control" rows="4" style="resize:none" placeholder="Enter you message" @bind="@NewMessage"></textarea>
+                    <textarea class="form-control" rows="4" style="resize:none" placeholder="Enter you message" readonly="@(!IsStreamingCompleted)" @bind="@NewMessage"></textarea>
                     <button class="btn btn-sm btn-success" disabled="@(!IsStreamingCompleted)" @onclick="async () => await SendAsync()"><span class="oi oi-location"></span> Send<br />Message</button>
                 </div>
             </div>
