@@ -33,7 +33,7 @@ public static class ChatHelper
             ConnectionId = connectionId,
             Username = username,
             Duration = sw.Elapsed.ToString(),
-            Message = new(last.Message.Sender, appendedText + last.Message.Text),
+            Message = new(last.Message.Sender, appendedText),
             ModelId = last.ModelId,
             SentTime = last.CreatedAt.LocalDateTime
         };
