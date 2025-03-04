@@ -83,7 +83,7 @@ public static class ChatHelper
         return val.Message.Sender switch
         {
             ChatSender.Assistant => $"{val.SentTime.ToLongTimeString()}  |  Duration: {duration}  |  Model: {val.ModelId} | Streaming ID: {msg.Key}",
-            ChatSender.User => $"{val.SentTime.ToLongTimeString()} [{msg.Key}]",
+            ChatSender.User => $"{val.SentTime.ToLongTimeString()} | Streaming ID: {msg.Key}",
             _ => string.Empty,
         };
     }
