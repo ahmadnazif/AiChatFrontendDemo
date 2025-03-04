@@ -95,7 +95,7 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
             StreamingSw.Reset();
         }
 
-        //StateHasChanged();
+        StateHasChanged();
     }
 
     protected async Task SendAsync()
