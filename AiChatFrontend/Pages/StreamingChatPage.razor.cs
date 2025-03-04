@@ -2,6 +2,7 @@
 using AiChatFrontend.Services;
 using Microsoft.AspNetCore.Components;
 using Sotsera.Blazor.Toaster;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 
 namespace AiChatFrontend.Pages;
@@ -68,24 +69,7 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
             LogError(ex.Message, true);
         }
     }
-
-    //private void OnStreamingChatReceived(object sender, StreamingChatReceivedEventArgs e)
-    //{
-    //    var resp = e.Response;
-    //    AppendedText += resp.Message.Text;
-
-    //    if (resp.HasFinished)
-    //    {
-    //        var last = ChatHelper.BuildLastChatLog(ConnectionId, Username, AppendedText, resp);
-    //        ChatLogs.Add(last);
-    //        AppendedText = string.Empty;
-    //        IsWaitingResponse = false;
-    //        Toastr.Info($"Finished at {DateTime.Now.ToLongTimeString()}");
-    //    }
-
-    //    StateHasChanged();
-    //}
-
+    
     private void OnStreamingChatReceived(object sender, StreamingChatReceivedEventArgs e)
     {
         var resp = e.Response;
@@ -101,22 +85,18 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
 
         AppendedText += resp.Message.Text;
         var current = ChatHelper.BuildChatLog(ConnectionId, Username, AppendedText, resp, StreamingSw);
-        //if (ChatLogs.TryGetValue(StreamingId, out var _))
-        //{
-        //    ChatLogs[StreamingId] = last;
-        //}
         ChatHelper.AppendChatLogs(StreamingId, ChatLogs, current);
 
         if (resp.HasFinished)
         {
             StreamingSw.Stop();
-            StreamingSw.Reset();
             AppendedText = string.Empty;
             IsStreamingCompleted = true;
             Toastr.Info($"Finished at {DateTime.Now.ToLongTimeString()} [{StreamingSw.Elapsed}]");
+            StreamingSw.Reset();
         }
 
-        StateHasChanged();
+        //StateHasChanged();
     }
 
     protected async Task SendAsync()
