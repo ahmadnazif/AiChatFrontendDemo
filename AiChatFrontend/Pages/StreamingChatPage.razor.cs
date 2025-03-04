@@ -100,11 +100,12 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
         }
 
         AppendedText += resp.Message.Text;
-        var last = ChatHelper.BuildChatLog(ConnectionId, Username, AppendedText, resp, StreamingSw);
-        if (ChatLogs.TryGetValue(StreamingId, out var _))
-        {
-            ChatLogs[StreamingId] = last;
-        }
+        var current = ChatHelper.BuildChatLog(ConnectionId, Username, AppendedText, resp, StreamingSw);
+        //if (ChatLogs.TryGetValue(StreamingId, out var _))
+        //{
+        //    ChatLogs[StreamingId] = last;
+        //}
+        ChatHelper.AppendChatLogs(StreamingId, ChatLogs, current);
 
         if (resp.HasFinished)
         {
@@ -112,7 +113,7 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
             StreamingSw.Reset();
             AppendedText = string.Empty;
             IsStreamingCompleted = true;
-            Toastr.Info($"Finished at {DateTime.Now.ToLongTimeString()}");
+            Toastr.Info($"Finished at {DateTime.Now.ToLongTimeString()} [{StreamingSw.Elapsed}]");
         }
 
         StateHasChanged();

@@ -1,5 +1,7 @@
-﻿using Markdig.Parsers;
+﻿using AiChatFrontend.Models;
+using Markdig.Parsers;
 using Microsoft.AspNetCore.Components;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 
@@ -84,5 +86,24 @@ public static class ChatHelper
             ChatSender.User => $"{val.SentTime.ToLongTimeString()} [{msg.Key}]",
             _ => string.Empty,
         };
+    }
+
+    /// <summary>
+    /// <code>
+    ///    if (previous.TryGetValue(streamingId, out _))
+    ///    {
+    ///        previous[streamingId] = current;
+    ///    }
+    /// </code>
+    /// </summary>
+    /// <param name="streamingId"></param>
+    /// <param name="previous"></param>
+    /// <param name="current"></param>
+    public static void AppendChatLogs(string streamingId, Dictionary<string, ChatLog> previous, ChatLog current)
+    {
+        if (previous.TryGetValue(streamingId, out _))
+        {
+            previous[streamingId] = current;
+        }
     }
 }
