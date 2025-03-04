@@ -112,7 +112,7 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
             return;
         }
 
-        var id = Guid.NewGuid().ToString("N").ToUpper();
+        var id = Generator.NextStreamingId();
         ChatLogs.Add(id, new()
         {
             ConnectionId = UserSession.ConnectionId,
@@ -124,10 +124,9 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
         var prev = ChatHelper.BuildPreviousMessages([.. ChatLogs.Values]);
 
         IsStreamingCompleted = false;
-        await Chat.StartChatStreamingAsync(NewMessage, prev);
-
         Log($"[SENT] {UserSession.Username}: {NewMessage}");
 
+        await Chat.StartChatStreamingAsync(NewMessage, prev);
         NewMessage = string.Empty;
     }
 
