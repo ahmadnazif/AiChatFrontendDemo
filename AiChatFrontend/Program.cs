@@ -2,6 +2,7 @@ global using System.Text.Json;
 global using AiChatFrontend.Models;
 global using AiChatFrontend.Enums;
 global using AiChatFrontend.Helpers;
+global using AiChatFrontend.Events;
 using AiChatFrontend;
 using AiChatFrontend.Services;
 using Microsoft.AspNetCore.Components.Web;

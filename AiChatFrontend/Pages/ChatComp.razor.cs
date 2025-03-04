@@ -1,5 +1,4 @@
-﻿using AiChatFrontend.EventArgs;
-using AiChatFrontend.Services;
+﻿using AiChatFrontend.Services;
 using Microsoft.AspNetCore.Components;
 using Sotsera.Blazor.Toaster;
 
