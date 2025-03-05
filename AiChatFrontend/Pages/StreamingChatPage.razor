@@ -79,9 +79,16 @@ else
                     }
                 }
                 <hr />
+                @if (ChatLogs.Count > 0)
+                {
+                    <div class="alert alert-secondary">
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => ClearChat()">Clear Chat</button>
+                    </div>
+                }
                 <div class="input-group">
                     <textarea class="form-control" rows="4" style="resize:none" placeholder="Enter you message" readonly="@(!IsStreamingCompleted)" @bind="@NewMessage"></textarea>
-                    <button class="btn btn-sm btn-success" disabled="@(!IsStreamingCompleted)" @onclick="async () => await SendAsync()"><span class="oi oi-location"></span> Send<br />Message</button>
+                    <button class="btn btn-sm btn-outline-success" disabled="@(!IsStreamingCompleted)" @onclick="async () => await SendAsync()">Send<br />Message</button>
+                    <button class="btn btn-sm btn-outline-danger" disabled="@IsStreamingCompleted" @onclick="() => StopStreaming()">Stop<br />Streaming</button>
                 </div>
             </div>
         }

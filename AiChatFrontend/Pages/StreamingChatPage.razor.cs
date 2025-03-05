@@ -130,7 +130,22 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
         NewMessage = string.Empty;
     }
 
-    protected void Stop() => Chat.StopChatStreaming();
+    protected void StopStreaming()
+    {
+        Chat.StopChatStreaming();
+        IsStreamingCompleted = true;
+    }
+
+    protected void ClearChat()
+    {
+        if (!IsStreamingCompleted)
+        {
+            Toastr.Warning("Please wait until streaming data is completed, or click on \"Stop Streaming\" to stop first");
+            return;
+        }
+
+        ChatLogs.Clear();
+    }
 
     protected async Task DisconnectAsync()
     {
