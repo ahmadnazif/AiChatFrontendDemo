@@ -68,7 +68,7 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
             LogError(ex.Message, true);
         }
     }
-    
+
     private void OnStreamingChatReceived(object sender, StreamingChatReceivedEventArgs e)
     {
         var resp = e.Response;

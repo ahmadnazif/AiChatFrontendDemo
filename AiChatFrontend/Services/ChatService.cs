@@ -9,7 +9,8 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     private readonly IConfiguration config = config;
     private readonly ILogger<ChatService> logger = logger;
     private HubConnection hubConnection;
-    private CancellationTokenSource cts;
+    private CancellationTokenSource ctsStreaming;
+    private CancellationTokenSource ctsChannel;
 
     /// <summary>
     /// Occured when single message received
@@ -25,6 +26,11 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     /// Occured when message received using streaming
     /// </summary>
     public event StreamingChatReceivedEventHandler OnStreamingChatReceived;
+
+    /// <summary>
+    /// Occured when messsage received using <see cref="System.Threading.Channels.ChannelReader{StreamingChatResponse}"/> streaming
+    /// </summary>
+    public event StreamingChatReceivedEventHandler OnChannelStreamingChatReceived;
 
     /// <summary>
     /// Start the connection with username
@@ -102,9 +108,11 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
         }
     }
 
+    #region Streaming chat with IAsyncEnumerable
+
     public async Task StartChatStreamingAsync(string message, List<ChatMsg> previousMsg)
     {
-        cts = new();
+        ctsStreaming = new();
 
         ChainedChatRequest req = new()
         {
@@ -113,7 +121,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
         };
 
         logger.LogInformation("Streaming started");
-        await foreach(var resp in hubConnection.StreamAsync<StreamingChatResponse>("StreamChatAsync", req, cts.Token))
+        await foreach (var resp in hubConnection.StreamAsync<StreamingChatResponse>("StreamChatAsync", req, ctsStreaming.Token))
         {
             OnStreamingChatReceived?.Invoke(this, new StreamingChatReceivedEventArgs(resp));
         }
@@ -121,9 +129,42 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
 
     public void StopChatStreaming()
     {
-        cts.Cancel();
+        ctsStreaming.Cancel();
         logger.LogInformation("Streaming stopped");
     }
+
+    #endregion
+
+    #region Streaming chat with ChannelReader
+
+    public async Task StartChatChannelStreamingAsync(string message, List<ChatMsg> previousMsg)
+    {
+        ctsChannel = new();
+
+        ChainedChatRequest req = new()
+        {
+            PreviousMessages = previousMsg,
+            Prompt = new(ChatSender.User, message)
+        };
+
+        logger.LogInformation("Streaming started");
+        var reader = await hubConnection.StreamAsChannelAsync<StreamingChatResponse>("StreamChatAsChannel", req, ctsChannel.Token);
+        while (await reader.WaitToReadAsync())
+        {
+            while (reader.TryRead(out var resp))
+            {
+                OnChannelStreamingChatReceived?.Invoke(this, new StreamingChatReceivedEventArgs(resp));
+            }
+        }
+    }
+
+    public void StopChatChannelStreaming()
+    {
+        ctsChannel.Cancel();
+        logger.LogInformation("Streaming stopped");
+    }
+
+    #endregion
 
     /// <summary>
     /// Stop the connection and dispose the hub
