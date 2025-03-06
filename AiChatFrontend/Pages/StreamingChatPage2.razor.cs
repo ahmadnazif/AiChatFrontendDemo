@@ -13,7 +13,7 @@ public class StreamingChatPage2Base : ComponentBase, IDisposable
     [Inject] public NavigationManager NavMan { get; set; }
     [Inject] public ChatService2 Chat { get; set; }
     [Inject] public ApiClient Api { get; set; }
-    [Inject] public SessionCache Cache { get; set; }
+    [Inject] public SessionCache SessionCache { get; set; }
     [Inject] public ChatCache ChatCache { get; set; }
     protected bool IsApiConnected { get; set; }
     protected bool IsStreamingCompleted { get; set; } = true;
@@ -48,12 +48,12 @@ public class StreamingChatPage2Base : ComponentBase, IDisposable
             StreamingId = resp.StreamingId;
             StreamingSw.Start();
 
-            var first = ChatHelper.BuildChatLog(ConnectionId, Cache.Session.Username, AppendedText, resp, StreamingSw);
+            var first = ChatHelper.BuildChatLog(SessionCache, AppendedText, resp, StreamingSw);
             ChatCache.Add(resp.StreamingId, first);            
         }
 
         AppendedText += resp.Message.Text;
-        var current = ChatHelper.BuildChatLog(ConnectionId, Cache.Session.Username, AppendedText, resp, StreamingSw);
+        var current = ChatHelper.BuildChatLog(SessionCache, AppendedText, resp, StreamingSw);
         ChatHelper.AppendChatLogs(StreamingId, ChatCache.ChatLogs, current);
 
         if (resp.HasFinished)
@@ -79,8 +79,8 @@ public class StreamingChatPage2Base : ComponentBase, IDisposable
         var id = Generator.NextStreamingId();
         ChatCache.Add(id, new()
         {
-            ConnectionId = Cache.Session.ConnectionId,
-            Username = Cache.Session.Username,
+            ConnectionId = SessionCache.Session.ConnectionId,
+            Username = SessionCache.Session.Username,
             Message = new(ChatSender.User, NewMessage),
             SentTime = DateTime.Now
         });
@@ -88,7 +88,7 @@ public class StreamingChatPage2Base : ComponentBase, IDisposable
         var prev = ChatHelper.BuildPreviousMessages([.. ChatCache.ChatLogs.Values]);
 
         IsStreamingCompleted = false;
-        Log($"[SENT] {Cache.Session.Username}: {NewMessage}");
+        Log($"[SENT] {SessionCache.Session.Username}: {NewMessage}");
 
         await Chat.StartChatStreamingAsync(NewMessage, prev);
         NewMessage = string.Empty;

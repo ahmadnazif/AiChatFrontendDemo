@@ -12,7 +12,7 @@ else
 
     <h3>Streaming Chat</h3>
 
-    if (!Cache.IsAuthenticated)
+    if (!SessionCache.IsAuthenticated)
     {
         <div class="alert alert-danger">
             Please initialize SignalR connection in <a href="user-info">user info</a> page first
@@ -21,7 +21,7 @@ else
     else
     {
         <div>
-            <label><strong>Username</strong>: @Cache.Session.Username | <strong>Connection ID:</strong> @Cache.Session.ConnectionId | <strong>Started:</strong> @Cache.Session.StartTime </label>
+            <label><strong>Username</strong>: @SessionCache.Session.Username | <strong>Connection ID:</strong> @SessionCache.Session.ConnectionId | <strong>Started:</strong> @SessionCache.Session.StartTime </label>
         </div>
 
         <div class="content px-4">
