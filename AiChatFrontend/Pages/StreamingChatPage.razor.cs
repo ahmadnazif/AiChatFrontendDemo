@@ -47,7 +47,7 @@ public class StreamingChatPageBase : ComponentBase, IDisposable
             StreamingSw.Start();
 
             var first = ChatHelper.BuildChatLog(SessionCache, AppendedText, resp, StreamingSw);
-            ChatCache.Add(resp.StreamingId, first);            
+            ChatCache.Add(resp.StreamingId, first);
         }
 
         AppendedText += resp.Message.Text;
@@ -111,6 +111,9 @@ public class StreamingChatPageBase : ComponentBase, IDisposable
 
     public void Dispose()
     {
+        if (!IsStreamingCompleted)
+            ChatCache.Remove(StreamingId);
+
         Chat.OnStreamingChatReceived -= OnStreamingChatReceived;
         GC.SuppressFinalize(this);
         Log("Disposed");
