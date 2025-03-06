@@ -6,9 +6,9 @@ using System.Diagnostics;
 
 namespace AiChatFrontend.Pages;
 
-public class StreamingChatPage2Base : ComponentBase, IDisposable
+public class StreamingChatPageBase : ComponentBase, IDisposable
 {
-    [Inject] public ILogger<StreamingChatPage2Base> Logger { get; set; }
+    [Inject] public ILogger<StreamingChatPageBase> Logger { get; set; }
     [Inject] public IToaster Toastr { get; set; }
     [Inject] public NavigationManager NavMan { get; set; }
     [Inject] public ChatService2 Chat { get; set; }
