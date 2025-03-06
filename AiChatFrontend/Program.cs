@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Sotsera.Blazor.Toaster.Core.Models;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
+using AiChatFrontend.CacheServices;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 var config = builder.Configuration;
@@ -17,6 +18,7 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddSingleton<CacheService>();
+builder.Services.AddSingleton<ChatCache>();
 builder.Services.AddScoped<ChatService>();
 builder.Services.AddScoped<ChatService2>();
 

@@ -15,49 +15,50 @@ else
     if (!Cache.IsAuthenticated)
     {
         <div class="alert alert-danger">
-            Please set your username at <a href="user-info">user info</a> page first
+            Please initialize SignalR connection in <a href="user-info">user info</a> page first
         </div>
     }
     else
     {
+        <div>
+            <label><strong>Username</strong>: @Cache.Session.Username | <strong>Connection ID:</strong> @Cache.Session.ConnectionId | <strong>Started:</strong> @Cache.Session.StartTime </label>
+        </div>
+
         <div class="content px-4">
-            @if (IsChatting)
-            {
-                <div id="scrollbox">
-                    <hr />
-                    @if (ChatLogs.Count == 0)
-                    {
-                        <div class="alert alert-success">
-                            <div class="text-center">
-                                Start your chat by entering your message below, then hit "Send Message"
-                            </div>
+            <div id="scrollbox">
+                <hr />
+                @if (ChatCache.Count == 0)
+                {
+                    <div class="alert alert-success">
+                        <div class="text-center">
+                            Start your chat by entering your message below, then hit "Send Message"
                         </div>
-                    }
-                    else
-                    {
-                        @foreach (var item in ChatLogs)
-                        {
-                            <div class="@ChatHelper.GetChatCss(item.Value)">
-                                <div class="user">@ChatHelper.GetUsername(item.Value)</div>
-                                <div class="markdown-content">@ChatHelper.GetMessageText(item.Value)</div>
-                                <font size="1">@ChatHelper.GetChatFooter(item)</font>
-                            </div>
-                        }
-                    }
-                    <hr />
-                    @if (ChatLogs.Count > 0)
-                    {
-                        <div class="alert alert-secondary">
-                            <button class="btn btn-sm btn-outline-danger" @onclick="() => ClearChat()">Clear Chat</button>
-                        </div>
-                    }
-                    <div class="input-group">
-                        <textarea class="form-control" rows="4" style="resize:none" placeholder="Enter you message" readonly="@(!IsStreamingCompleted)" @bind="@NewMessage"></textarea>
-                        <button class="btn btn-sm btn-outline-success" disabled="@(!IsStreamingCompleted)" @onclick="async () => await SendAsync()">Send<br />Message</button>
-                        <button class="btn btn-sm btn-outline-danger" disabled="@IsStreamingCompleted" @onclick="() => StopStreaming()">Stop<br />Streaming</button>
                     </div>
+                }
+                else
+                {
+                    @foreach (var item in ChatCache.ChatLogs)
+                    {
+                        <div class="@ChatHelper.GetChatCss(item.Value)">
+                            <div class="user">@ChatHelper.GetUsername(item.Value)</div>
+                            <div class="markdown-content">@ChatHelper.GetMessageText(item.Value)</div>
+                            <font size="1">@ChatHelper.GetChatFooter(item)</font>
+                        </div>
+                    }
+                }
+                <hr />
+                @if (ChatCache.Count > 0)
+                {
+                    <div class="alert alert-secondary">
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => ClearChat()">Clear Chat</button>
+                    </div>
+                }
+                <div class="input-group">
+                    <textarea class="form-control" rows="4" style="resize:none" placeholder="Enter you message" readonly="@(!IsStreamingCompleted)" @bind="@NewMessage"></textarea>
+                    <button class="btn btn-sm btn-outline-success" disabled="@(!IsStreamingCompleted)" @onclick="async () => await SendAsync()">Send<br />Message</button>
+                    <button class="btn btn-sm btn-outline-danger" disabled="@IsStreamingCompleted" @onclick="() => StopStreaming()">Stop<br />Streaming</button>
                 </div>
-            }
+            </div>
 
         </div>
     }

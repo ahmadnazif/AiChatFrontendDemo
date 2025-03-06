@@ -1,4 +1,5 @@
-﻿using AiChatFrontend.Services;
+﻿using AiChatFrontend.CacheServices;
+using AiChatFrontend.Services;
 using Microsoft.AspNetCore.Components;
 using Sotsera.Blazor.Toaster;
 using System.Diagnostics;
@@ -13,16 +14,16 @@ public class StreamingChatPage2Base : ComponentBase, IDisposable
     [Inject] public ChatService2 Chat { get; set; }
     [Inject] public ApiClient Api { get; set; }
     [Inject] public CacheService Cache { get; set; }
+    [Inject] public ChatCache ChatCache { get; set; }
     protected bool IsApiConnected { get; set; }
-    protected bool IsChatting { get; set; } = false;
     protected bool IsStreamingCompleted { get; set; } = true;
     protected string StreamingId { get; set; }
     protected Stopwatch StreamingSw { get; set; } = new Stopwatch();
     protected string? AppendedText { get; set; }
-    protected string Username { get; set; }
+    //protected string Username { get; set; }
     protected string ConnectionId { get; set; }
     protected string NewMessage { get; set; }
-    protected Dictionary<string, ChatLog> ChatLogs { get; set; } = [];
+    //protected Dictionary<string, ChatLog> ChatLogs { get; set; } = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -30,13 +31,11 @@ public class StreamingChatPage2Base : ComponentBase, IDisposable
         try
         {
             Chat.OnStreamingChatReceived += OnStreamingChatReceived;
-            IsChatting = true;
         }
         catch (Exception ex)
         {
             Chat.OnStreamingChatReceived -= OnStreamingChatReceived;
-            Logger.LogError(ex.Message);
-            IsChatting = false;
+            LogError(ex.Message);
         }
     }
 
@@ -49,13 +48,13 @@ public class StreamingChatPage2Base : ComponentBase, IDisposable
             StreamingId = resp.StreamingId;
             StreamingSw.Start();
 
-            var first = ChatHelper.BuildChatLog(ConnectionId, Username, AppendedText, resp, StreamingSw);
-            ChatLogs.Add(resp.StreamingId, first);
+            var first = ChatHelper.BuildChatLog(ConnectionId, Cache.Session.Username, AppendedText, resp, StreamingSw);
+            ChatCache.Add(resp.StreamingId, first);            
         }
 
         AppendedText += resp.Message.Text;
-        var current = ChatHelper.BuildChatLog(ConnectionId, Username, AppendedText, resp, StreamingSw);
-        ChatHelper.AppendChatLogs(StreamingId, ChatLogs, current);
+        var current = ChatHelper.BuildChatLog(ConnectionId, Cache.Session.Username, AppendedText, resp, StreamingSw);
+        ChatHelper.AppendChatLogs(StreamingId, ChatCache.ChatLogs, current);
 
         if (resp.HasFinished)
         {
@@ -77,14 +76,8 @@ public class StreamingChatPage2Base : ComponentBase, IDisposable
             return;
         }
 
-        if (!IsChatting)
-        {
-            Toastr.Error("Chatting is not initiated");
-            return;
-        }
-
         var id = Generator.NextStreamingId();
-        ChatLogs.Add(id, new()
+        ChatCache.Add(id, new()
         {
             ConnectionId = Cache.Session.ConnectionId,
             Username = Cache.Session.Username,
@@ -92,7 +85,7 @@ public class StreamingChatPage2Base : ComponentBase, IDisposable
             SentTime = DateTime.Now
         });
 
-        var prev = ChatHelper.BuildPreviousMessages([.. ChatLogs.Values]);
+        var prev = ChatHelper.BuildPreviousMessages([.. ChatCache.ChatLogs.Values]);
 
         IsStreamingCompleted = false;
         Log($"[SENT] {Cache.Session.Username}: {NewMessage}");
@@ -115,7 +108,7 @@ public class StreamingChatPage2Base : ComponentBase, IDisposable
             return;
         }
 
-        ChatLogs.Clear();
+        ChatCache.Clear();
     }
 
     public void Dispose()

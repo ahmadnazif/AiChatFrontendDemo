@@ -1,4 +1,5 @@
 ﻿using AiChatFrontend.Models;
+using AiChatFrontend.Services;
 using Markdig.Parsers;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
@@ -32,6 +33,19 @@ public static class ChatHelper
         {
             ConnectionId = connectionId,
             Username = username,
+            Duration = sw.Elapsed.ToString(),
+            Message = new(last.Message.Sender, appendedText),
+            ModelId = last.ModelId,
+            SentTime = last.CreatedAt.LocalDateTime
+        };
+    }
+
+    public static ChatLog BuildChatLog(CacheService cache, string appendedText, StreamingChatResponse last, Stopwatch sw)
+    {
+        return new()
+        {
+            ConnectionId = cache.Session.ConnectionId,
+            Username = cache.Session.Username,
             Duration = sw.Elapsed.ToString(),
             Message = new(last.Message.Sender, appendedText),
             ModelId = last.ModelId,
