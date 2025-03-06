@@ -1,4 +1,4 @@
-﻿namespace AiChatFrontend.Services;
+﻿namespace AiChatFrontend.CacheServices;
 
 public class SessionCache
 {
