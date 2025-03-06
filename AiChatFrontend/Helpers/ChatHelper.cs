@@ -40,7 +40,7 @@ public static class ChatHelper
         };
     }
 
-    public static ChatLog BuildChatLog(CacheService cache, string appendedText, StreamingChatResponse last, Stopwatch sw)
+    public static ChatLog BuildChatLog(SessionCache cache, string appendedText, StreamingChatResponse last, Stopwatch sw)
     {
         return new()
         {

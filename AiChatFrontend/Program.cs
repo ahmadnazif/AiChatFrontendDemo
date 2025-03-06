@@ -17,7 +17,7 @@ var config = builder.Configuration;
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddSingleton<CacheService>();
+builder.Services.AddSingleton<SessionCache>();
 builder.Services.AddSingleton<ChatCache>();
 builder.Services.AddScoped<ChatService>();
 builder.Services.AddScoped<ChatService2>();

@@ -13,7 +13,7 @@ public class StreamingChatPage2Base : ComponentBase, IDisposable
     [Inject] public NavigationManager NavMan { get; set; }
     [Inject] public ChatService2 Chat { get; set; }
     [Inject] public ApiClient Api { get; set; }
-    [Inject] public CacheService Cache { get; set; }
+    [Inject] public SessionCache Cache { get; set; }
     [Inject] public ChatCache ChatCache { get; set; }
     protected bool IsApiConnected { get; set; }
     protected bool IsStreamingCompleted { get; set; } = true;

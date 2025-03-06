@@ -9,7 +9,7 @@ namespace AiChatFrontend.Pages;
 public class UserPageBase : ComponentBase
 {
     [Inject] public ILogger<UserPageBase> Logger { get; set; }
-    [Inject] public CacheService Cache { get; set; }
+    [Inject] public SessionCache Cache { get; set; }
     [Inject] public IToaster Toastr { get; set; }
     [Inject] public ApiClient Api { get; set; }
     [Inject] public ChatService2 Chat { get; set; }

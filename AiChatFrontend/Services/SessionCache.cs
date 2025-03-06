@@ -1,6 +1,6 @@
 ﻿namespace AiChatFrontend.Services;
 
-public class CacheService
+public class SessionCache
 {
     public UserSession Session { get; private set; } = null;
 
