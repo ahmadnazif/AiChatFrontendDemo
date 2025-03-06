@@ -2,10 +2,10 @@
 
 namespace AiChatFrontend.Services;
 
-public class ChatService2(IConfiguration config, ILogger<ChatService2> logger) : IAsyncDisposable
+public class ChatService(IConfiguration config, ILogger<ChatService> logger) : IAsyncDisposable
 {
     private readonly IConfiguration config = config;
-    private readonly ILogger<ChatService2> logger = logger;
+    private readonly ILogger<ChatService> logger = logger;
     private HubConnection hubConnection;
     private CancellationTokenSource ctsStreaming;
     private CancellationTokenSource ctsChannel;

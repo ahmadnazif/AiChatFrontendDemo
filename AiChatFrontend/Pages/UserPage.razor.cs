@@ -13,7 +13,7 @@ public class UserPageBase : ComponentBase
     [Inject] public SessionCache SessionCache { get; set; }
     [Inject] public IToaster Toastr { get; set; }
     [Inject] public ApiClient Api { get; set; }
-    [Inject] public ChatService2 Chat { get; set; }
+    [Inject] public ChatService Chat { get; set; }
     protected string Username { get; set; }
 
     protected async Task ConnectAsync()

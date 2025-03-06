@@ -20,7 +20,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddSingleton<SessionCache>();
 builder.Services.AddSingleton<ChatCache>();
 builder.Services.AddScoped<ChatServiceOld>();
-builder.Services.AddScoped<ChatService2>();
+builder.Services.AddScoped<ChatService>();
 
 builder.Services.AddToaster(new ToasterConfiguration
 {
