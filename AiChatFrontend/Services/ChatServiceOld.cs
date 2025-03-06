@@ -4,10 +4,10 @@ using System.Reflection.Metadata;
 
 namespace AiChatFrontend.Services;
 
-public class ChatService(IConfiguration config, ILogger<ChatService> logger) : IAsyncDisposable
+public class ChatServiceOld(IConfiguration config, ILogger<ChatServiceOld> logger) : IAsyncDisposable
 {
     private readonly IConfiguration config = config;
-    private readonly ILogger<ChatService> logger = logger;
+    private readonly ILogger<ChatServiceOld> logger = logger;
     private HubConnection hubConnection;
     private CancellationTokenSource ctsStreaming;
     private CancellationTokenSource ctsChannel;

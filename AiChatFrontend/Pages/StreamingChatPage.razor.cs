@@ -11,7 +11,7 @@ public class StreamingChatPageBase : ComponentBase, IAsyncDisposable
     [Inject] public ILogger<StreamingChatPageBase> Logger { get; set; }
     [Inject] public IToaster Toastr { get; set; }
     [Inject] public NavigationManager NavMan { get; set; }
-    [Inject] public ChatService Chat { get; set; }
+    [Inject] public ChatServiceOld Chat { get; set; }
     [Inject] public ApiClient Api { get; set; }
     protected bool IsApiConnected { get; set; }
     protected bool IsChatting { get; set; } = false;
