@@ -20,10 +20,7 @@ public class StreamingChatPage2Base : ComponentBase, IDisposable
     protected string StreamingId { get; set; }
     protected Stopwatch StreamingSw { get; set; } = new Stopwatch();
     protected string? AppendedText { get; set; }
-    //protected string Username { get; set; }
-    protected string ConnectionId { get; set; }
     protected string NewMessage { get; set; }
-    //protected Dictionary<string, ChatLog> ChatLogs { get; set; } = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -36,6 +33,7 @@ public class StreamingChatPage2Base : ComponentBase, IDisposable
         {
             Chat.OnStreamingChatReceived -= OnStreamingChatReceived;
             LogError(ex.Message);
+            Toastr.Error(ex.Message);
         }
     }
 

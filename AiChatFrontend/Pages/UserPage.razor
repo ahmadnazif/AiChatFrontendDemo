@@ -3,20 +3,20 @@
 
 <h3>User Information</h3>
 
-@if (Cache.IsAuthenticated)
+@if (SessionCache.IsAuthenticated)
 {
     <div>
-        <label><strong>Username</strong>: @Username | <strong>Connection ID:</strong> @Cache.Session?.ConnectionId | <strong>Started:</strong> @Cache.Session?.StartTime </label>
+        <label><strong>Username</strong>: @SessionCache.Session?.Username | <strong>Connection ID:</strong> @SessionCache.Session?.ConnectionId | <strong>Started:</strong> @SessionCache.Session?.StartTime </label>
         <button class="btn btn-danger btn-sm float-end" @onclick="async () => await DisconnectAsync()">Disconnect</button>
     </div>
 }
 else
 {
-    <label>Please enter your username to start:</label>
+    <label>Connect to SignalR hub by entering your username:</label>
     <div class="col-sm-4">
         <div class="input-group">
             <input class="form-control" type="text" placeholder="Enter username" @bind="Username" />
-            <button class="btn btn-success btn-sm" @onclick="async () => await StartAsync()">Enter Chat</button>
+            <button class="btn btn-success btn-sm" @onclick="async () => await ConnectAsync()">Connect</button>
         </div>
     </div>
 }

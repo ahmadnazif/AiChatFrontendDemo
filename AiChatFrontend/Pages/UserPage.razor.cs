@@ -10,20 +10,15 @@ namespace AiChatFrontend.Pages;
 public class UserPageBase : ComponentBase
 {
     [Inject] public ILogger<UserPageBase> Logger { get; set; }
-    [Inject] public SessionCache Cache { get; set; }
+    [Inject] public SessionCache SessionCache { get; set; }
     [Inject] public IToaster Toastr { get; set; }
     [Inject] public ApiClient Api { get; set; }
     [Inject] public ChatService2 Chat { get; set; }
     protected string Username { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected async Task ConnectAsync()
     {
-        //await StartAsync();
-    }
-
-    protected async Task StartAsync()
-    {
-        if (!Cache.IsAuthenticated)
+        if (!SessionCache.IsAuthenticated)
         {
             if (string.IsNullOrWhiteSpace(Username))
             {
@@ -43,8 +38,8 @@ public class UserPageBase : ComponentBase
             {
                 await Chat.ConnectAsync(Username);
                 var session = await Api.GetUserSessionByUsernameAsync(Username);
-                Cache.Start(session);
-
+                SessionCache.Start(session);
+                Toastr.Success($"Welcome {SessionCache.Session.Username}!");
             }
             catch (Exception ex)
             {
@@ -55,10 +50,10 @@ public class UserPageBase : ComponentBase
 
     protected async Task DisconnectAsync()
     {
-        if (Cache.IsAuthenticated)
+        if (SessionCache.IsAuthenticated)
         {
             await Chat.StopAsync();
-            Cache.Remove();
+            SessionCache.Remove();
             Username = null;
         }
     }
