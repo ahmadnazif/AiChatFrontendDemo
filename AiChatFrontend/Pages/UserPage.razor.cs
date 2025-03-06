@@ -43,7 +43,7 @@ public class UserPageBase : ComponentBase
             {
                 await Chat.ConnectAsync(Username);
                 var session = await Api.GetUserSessionByUsernameAsync(Username);
-                Cache.StartSession(session);
+                Cache.Start(session);
 
             }
             catch (Exception ex)
@@ -58,7 +58,7 @@ public class UserPageBase : ComponentBase
         if (Cache.IsAuthenticated)
         {
             await Chat.StopAsync();
-            Cache.RemoveSession();
+            Cache.Remove();
             Username = null;
         }
     }
