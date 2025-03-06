@@ -18,6 +18,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddSingleton<CacheService>();
 builder.Services.AddScoped<ChatService>();
+builder.Services.AddScoped<ChatService2>();
 
 builder.Services.AddToaster(new ToasterConfiguration
 {
