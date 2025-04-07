@@ -30,6 +30,8 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     /// </summary>
     public event StreamingChatReceivedEventHandler OnChannelStreamingChatReceived;
 
+    public event StreamingChatReceivedEventHandler OnFileStreamingChatReceived;
+
     /// <summary>
     /// Start the connection with username
     /// </summary>
