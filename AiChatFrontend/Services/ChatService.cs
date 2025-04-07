@@ -9,6 +9,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     private HubConnection hubConnection;
     private CancellationTokenSource ctsStreaming;
     private CancellationTokenSource ctsChannel;
+    private CancellationTokenSource ctsFileStreaming;
 
     /// <summary>
     /// Occured when single message received
@@ -59,10 +60,10 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
         await hubConnection.StartAsync();
     }
 
-    public void RegisterOnReceivedSingle() 
+    public void RegisterOnReceivedSingle()
         => hubConnection.On<SingleChatResponse>("OnReceivedSingle", response => OnSingleChatReceived?.Invoke(this, new SingleChatReceivedEventArgs(response)));
 
-    public void RegisterOnReceivedChained() 
+    public void RegisterOnReceivedChained()
         => hubConnection.On<ChainedChatResponse>("OnReceivedChained", response => OnChainedChatReceived?.Invoke(this, new ChainedChatReceivedEventArgs(response)));
 
 
@@ -169,6 +170,35 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     }
 
     #endregion
+
+    #region Streaming file chat with IAsyncEnumerable
+
+    public async Task StartFileChatStreamingAsync(string message, byte[] fileStream, string mediaType)
+    {
+        ctsStreaming = new();
+
+        FileChatRequest req = new()
+        {
+            FileStream = fileStream,
+            MediaType = mediaType,
+            Prompt = new(ChatSender.User, message)
+        };
+
+        logger.LogInformation("Streaming started");
+        await foreach (var resp in hubConnection.StreamAsync<StreamingChatResponse>("StreamFileChatAsync", req, ctsFileStreaming.Token))
+        {
+            OnFileStreamingChatReceived?.Invoke(this, new StreamingChatReceivedEventArgs(resp));
+        }
+    }
+
+    public void StopFileChatStreaming()
+    {
+        ctsFileStreaming.Cancel();
+        logger.LogInformation("Streaming stopped");
+    }
+
+    #endregion
+
 
     /// <summary>
     /// Stop the connection and dispose the hub
