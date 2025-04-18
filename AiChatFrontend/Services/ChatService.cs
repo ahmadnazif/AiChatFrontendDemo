@@ -175,7 +175,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
 
     public async Task StartFileChatStreamingAsync(string message, byte[] fileStream, string mediaType)
     {
-        ctsStreaming = new();
+        ctsFileStreaming = new();
 
         FileChatRequest req = new()
         {

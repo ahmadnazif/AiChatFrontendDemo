@@ -16,12 +16,13 @@ public class FileStreamingChatPageBase : ComponentBase, IDisposable
     [Inject] public ChatService Chat { get; set; }
     [Inject] public ApiClient Api { get; set; }
     [Inject] public SessionCache SessionCache { get; set; }
-    [Inject] public ChatCache ChatCache { get; set; }
+    [Inject] public FileChatCache ChatCache { get; set; }
     protected bool IsApiConnected { get; set; }
     protected bool IsStreamingCompleted { get; set; } = true;
     protected string StreamingId { get; set; }
     protected Stopwatch StreamingSw { get; set; } = new Stopwatch();
     protected string? AppendedText { get; set; }
+    protected List<ChatFile> ChatFiles { get; set; } = [];
     protected string NewMessage { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -29,11 +30,11 @@ public class FileStreamingChatPageBase : ComponentBase, IDisposable
         IsApiConnected = await Api.IsConnectedAsync();
         try
         {
-            Chat.OnStreamingChatReceived += OnStreamingChatReceived;
+            Chat.OnFileStreamingChatReceived += OnStreamingChatReceived;
         }
         catch (Exception ex)
         {
-            Chat.OnStreamingChatReceived -= OnStreamingChatReceived;
+            Chat.OnFileStreamingChatReceived -= OnStreamingChatReceived;
             LogError(ex.Message);
             Toastr.Error(ex.Message);
         }
@@ -80,7 +81,7 @@ public class FileStreamingChatPageBase : ComponentBase, IDisposable
                 return;
             }
 
-            List<ChatFile> chatFiles = new();
+            ChatFiles.Clear();
 
             var inputFiles = e.GetMultipleFiles();
 
@@ -90,7 +91,7 @@ public class FileStreamingChatPageBase : ComponentBase, IDisposable
                 await using var ms = new MemoryStream();
                 await stream.CopyToAsync(ms);
 
-                chatFiles.Add(new()
+                ChatFiles.Add(new()
                 {
                     FileName = file.Name,
                     FileStream = ms.ToArray(),
@@ -98,7 +99,7 @@ public class FileStreamingChatPageBase : ComponentBase, IDisposable
                 });
             }
 
-            Toastr.Success($"{chatFiles.Count} files ready");
+            Toastr.Success($"{ChatFiles.Count} files ready");
         }
         catch (Exception ex)
         {
@@ -123,12 +124,15 @@ public class FileStreamingChatPageBase : ComponentBase, IDisposable
             SentTime = DateTime.Now
         });
 
-        var prev = ChatHelper.BuildPreviousMessages([.. ChatCache.ChatLogs.Values]);
+        //var prev = ChatHelper.BuildPreviousMessages([.. ChatCache.ChatLogs.Values]);
 
         IsStreamingCompleted = false;
         Log($"[SENT] {SessionCache.Session.Username}: {NewMessage}");
 
-        await Chat.StartChatStreamingAsync(NewMessage, prev);
+        var stream = ChatFiles[0].FileStream;
+        var mediatype = ChatFiles[0].MediaType;
+
+        await Chat.StartFileChatStreamingAsync(NewMessage, stream, mediatype);
         NewMessage = string.Empty;
     }
 
