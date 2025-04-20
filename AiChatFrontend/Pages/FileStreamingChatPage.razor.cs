@@ -44,15 +44,16 @@ public class FileStreamingChatPageBase : ComponentBase, IDisposable
     {
         var resp = e.Response;
 
+        //Logger.LogInformation($"{resp.StreamingId} {resp.Message.Text}");
         if (StreamingId != resp.StreamingId)
         {
             StreamingId = resp.StreamingId;
             StreamingSw.Start();
 
             var first = ChatHelper.BuildChatLog(SessionCache, AppendedText, resp, StreamingSw);
-            ChatCache.Add(resp.StreamingId, first);
+            ChatCache.TryAdd(resp.StreamingId, first);
         }
-
+        
         AppendedText += resp.Message.Text;
         var current = ChatHelper.BuildChatLog(SessionCache, AppendedText, resp, StreamingSw);
         ChatHelper.AppendChatLogs(StreamingId, ChatCache.ChatLogs, current);
@@ -116,7 +117,7 @@ public class FileStreamingChatPageBase : ComponentBase, IDisposable
         }
 
         var id = Generator.NextStreamingId();
-        ChatCache.Add(id, new()
+        ChatCache.TryAdd(id, new()
         {
             ConnectionId = SessionCache.Session.ConnectionId,
             Username = SessionCache.Session.Username,

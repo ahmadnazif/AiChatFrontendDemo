@@ -17,6 +17,17 @@ public class FileChatCache
         ChatLogs.Add(streamingId, log);
     }
 
+    public void TryAdd(string streamingId, ChatLog log)
+    {
+        if (string.IsNullOrWhiteSpace(streamingId))
+            return;
+
+        if (log == null)
+            return;
+
+        ChatLogs.TryAdd(streamingId, log);
+    }
+
     public bool Remove(string streamingId)
     {
         if (string.IsNullOrWhiteSpace(streamingId))
