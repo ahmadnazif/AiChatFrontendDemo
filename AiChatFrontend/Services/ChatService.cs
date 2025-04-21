@@ -10,7 +10,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     private CancellationTokenSource ctsStreaming;
     private CancellationTokenSource ctsChannel;
     private CancellationTokenSource ctsFileStreaming;
-
+    private CancellationTokenSource ctsFileStreamingNew;
     /// <summary>
     /// Occured when single message received
     /// </summary>
@@ -32,6 +32,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     public event StreamingChatReceivedEventHandler OnChannelStreamingChatReceived;
 
     public event StreamingChatReceivedEventHandler OnFileStreamingChatReceived;
+    public event StreamingChatReceivedEventHandler OnFileStreamingChatReceivedNew;
 
     /// <summary>
     /// Start the connection with username
@@ -194,6 +195,34 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     public void StopFileChatStreaming()
     {
         ctsFileStreaming.Cancel();
+        logger.LogInformation("Streaming stopped");
+    }
+
+    #endregion
+
+    #region Streaming file chat with IAsyncEnumerable (new)
+
+    public async Task StartFileChatStreamingNewAsync(string message, byte[] fileStream, string mediaType)
+    {
+        ctsFileStreamingNew = new();
+
+        FileChatRequest req = new()
+        {
+            FileStream = fileStream,
+            MediaType = mediaType,
+            Prompt = new(ChatSender.User, message)
+        };
+
+        logger.LogInformation("Streaming started");
+        await foreach (var resp in hubConnection.StreamAsync<StreamingChatResponse>("StreamFileChatNewAsync", req, ctsFileStreamingNew.Token))
+        {
+            OnFileStreamingChatReceivedNew?.Invoke(this, new StreamingChatReceivedEventArgs(resp));
+        }
+    }
+
+    public void StopFileChatStreamingNew()
+    {
+        ctsFileStreamingNew.Cancel();
         logger.LogInformation("Streaming stopped");
     }
 
