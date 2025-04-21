@@ -1,6 +1,6 @@
 ﻿namespace AiChatFrontend.Models;
 
-public class ChatFile
+public class ChatFileTemp
 {
     public string? FileName { get; set; }
     public byte[] FileStream { get; set; }

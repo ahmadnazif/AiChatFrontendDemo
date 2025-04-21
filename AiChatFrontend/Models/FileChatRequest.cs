@@ -1,6 +1,6 @@
 ﻿namespace AiChatFrontend.Models;
 
-public class FileChatRequest : ChatFile
+public class FileChatRequest : ChatFileTemp
 {
     public ChatMsg Prompt { get; set; }
 }

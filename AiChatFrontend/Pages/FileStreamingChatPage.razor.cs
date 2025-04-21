@@ -22,7 +22,7 @@ public class FileStreamingChatPageBase : ComponentBase, IDisposable
     protected string StreamingId { get; set; }
     protected Stopwatch StreamingSw { get; set; } = new Stopwatch();
     protected string? AppendedText { get; set; }
-    protected List<ChatFile> ChatFiles { get; set; } = [];
+    protected List<ChatFileTemp> ChatFiles { get; set; } = [];
     protected string NewMessage { get; set; }
 
     protected override async Task OnInitializedAsync()
