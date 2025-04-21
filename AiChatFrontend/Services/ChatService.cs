@@ -32,7 +32,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     public event StreamingChatReceivedEventHandler OnChannelStreamingChatReceived;
 
     public event StreamingChatReceivedEventHandler OnFileStreamingChatReceived;
-    public event StreamingChatReceivedEventHandler OnFileStreamingChatReceivedNew;
+    public event StreamingChatReceivedEventHandler OnChatReceived;
 
     /// <summary>
     /// Start the connection with username
@@ -202,7 +202,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
 
     #region Streaming file chat with IAsyncEnumerable (new)
 
-    public async Task StartFileChatStreamingNewAsync(string message, List<ChatFile> files, List<ChatContent> previous)
+    public async Task StartStreamingAsync(string message, List<ChatFile> files, List<ChatContent> previous)
     {
         ctsFileStreamingNew = new();
 
@@ -219,11 +219,11 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
         logger.LogInformation("Streaming started");
         await foreach (var resp in hubConnection.StreamAsync<StreamingChatResponse>("StreamFileChatNewAsync", req, ctsFileStreamingNew.Token))
         {
-            OnFileStreamingChatReceivedNew?.Invoke(this, new StreamingChatReceivedEventArgs(resp));
+            OnChatReceived?.Invoke(this, new StreamingChatReceivedEventArgs(resp));
         }
     }
 
-    public void StopFileChatStreamingNew()
+    public void StopStreaming()
     {
         ctsFileStreamingNew.Cancel();
         logger.LogInformation("Streaming stopped");

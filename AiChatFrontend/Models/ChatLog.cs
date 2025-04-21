@@ -12,7 +12,7 @@ public class ChatLog
     public DateTime SentTime { get; set; }
 }
 
-public class ChatLogStream
+public class ChatLogNew : ChatLog
 {
-    public ChatMsg Message { get; set; }
+    public List<ChatFile> Files { get; set; }
 }

@@ -27,6 +27,21 @@ public static class ChatHelper
         return list;
     }
 
+    public static List<ChatContent> BuildPreviousMessagesNew(List<ChatLogNew> logs)
+    {
+        List<ChatContent> list = [];
+
+        foreach (var m in logs)
+            list.Add(new()
+            {
+                Files = m.Files,
+                Message = m.Message
+            });
+        //list.Add(m.Message);
+
+        return list;
+    }
+
     public static ChatLog BuildChatLog(string connectionId, string username, string appendedText, StreamingChatResponse last, Stopwatch sw)
     {
         return new()
@@ -48,6 +63,20 @@ public static class ChatHelper
             Username = cache.Session.Username,
             Duration = sw.Elapsed.ToString(),
             Message = new(last.Message.Sender, appendedText),
+            ModelId = last.ModelId,
+            SentTime = last.CreatedAt.LocalDateTime
+        };
+    }
+
+    public static ChatLogNew BuildChatLogNew(SessionCache cache, string appendedText, List<ChatFile> files, StreamingChatResponse last, Stopwatch sw)
+    {
+        return new()
+        {
+            ConnectionId = cache.Session.ConnectionId,
+            Username = cache.Session.Username,
+            Duration = sw.Elapsed.ToString(),
+            Message = new(last.Message.Sender, appendedText),
+            Files = files,
             ModelId = last.ModelId,
             SentTime = last.CreatedAt.LocalDateTime
         };
@@ -90,7 +119,29 @@ public static class ChatHelper
         };
     }
 
+    public static string GetChatFooter(ChatLogNew msg)
+    {
+        return msg.Message.Sender switch
+        {
+            ChatSender.Assistant => $"{msg.SentTime.ToLongTimeString()}  |  Time taken: {msg.Duration}  |  Model: {msg.ModelId}",
+            ChatSender.User => msg.SentTime.ToLongTimeString(),
+            _ => string.Empty,
+        };
+    }
+
     public static string GetChatFooter(KeyValuePair<string, ChatLog> msg)
+    {
+        var val = msg.Value;
+        var duration = string.IsNullOrWhiteSpace(msg.Value.Duration) ? "receiving.." : msg.Value.Duration;
+        return val.Message.Sender switch
+        {
+            ChatSender.Assistant => $"{val.SentTime.ToLongTimeString()}  |  Duration: {duration}  |  Model: {val.ModelId} | Streaming ID: {msg.Key}",
+            ChatSender.User => $"{val.SentTime.ToLongTimeString()} | Streaming ID: {msg.Key}",
+            _ => string.Empty,
+        };
+    }
+
+    public static string GetChatFooter(KeyValuePair<string, ChatLogNew> msg)
     {
         var val = msg.Value;
         var duration = string.IsNullOrWhiteSpace(msg.Value.Duration) ? "receiving.." : msg.Value.Duration;
@@ -114,6 +165,14 @@ public static class ChatHelper
     /// <param name="previous"></param>
     /// <param name="current"></param>
     public static void AppendChatLogs(string streamingId, Dictionary<string, ChatLog> previous, ChatLog current)
+    {
+        if (previous.TryGetValue(streamingId, out _))
+        {
+            previous[streamingId] = current;
+        }
+    }
+
+    public static void AppendChatLogsNew(string streamingId, Dictionary<string, ChatLogNew> previous, ChatLogNew current)
     {
         if (previous.TryGetValue(streamingId, out _))
         {

@@ -2,21 +2,13 @@
 
 public class FileChatCache
 {
-    public Dictionary<string, ChatLog> ChatLogs { get; private set; } = [];
+    [Obsolete("Use ChatLogsNew")] public Dictionary<string, ChatLog> ChatLogs { get; private set; } = [];
+    public Dictionary<string, ChatLogNew> ChatLogsNew { get; private set; } = [];
 
-    public int Count => ChatLogs.Count;
+    [Obsolete] public int Count => ChatLogs.Count;
+    public int CountNew => ChatLogsNew.Count;
 
-    public void Add(string streamingId, ChatLog log)
-    {
-        if (string.IsNullOrWhiteSpace(streamingId))
-            return;
-
-        if (log == null)
-            return;
-
-        ChatLogs.Add(streamingId, log);
-    }
-
+    [Obsolete]
     public void TryAdd(string streamingId, ChatLog log)
     {
         if (string.IsNullOrWhiteSpace(streamingId))
@@ -28,6 +20,18 @@ public class FileChatCache
         ChatLogs.TryAdd(streamingId, log);
     }
 
+    public void TryAddNew(string streamingId, ChatLogNew log)
+    {
+        if (string.IsNullOrWhiteSpace(streamingId))
+            return;
+
+        if (log == null)
+            return;
+
+        ChatLogsNew.TryAdd(streamingId, log);
+    }
+
+    [Obsolete]
     public bool Remove(string streamingId)
     {
         if (string.IsNullOrWhiteSpace(streamingId))
@@ -36,9 +40,15 @@ public class FileChatCache
         return ChatLogs.Remove(streamingId);
     }
 
-    public void Clear()
+    public bool RemoveNew(string streamingId)
     {
-        ChatLogs.Clear();
+        if (string.IsNullOrWhiteSpace(streamingId))
+            return false;
+
+        return ChatLogsNew.Remove(streamingId);
     }
+
+    [Obsolete] public void Clear() => ChatLogs.Clear();
+    public void ClearNew() => ChatLogsNew.Clear();
 
 }
