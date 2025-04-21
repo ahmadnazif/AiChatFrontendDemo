@@ -202,15 +202,18 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
 
     #region Streaming file chat with IAsyncEnumerable (new)
 
-    public async Task StartFileChatStreamingNewAsync(string message, byte[] fileStream, string mediaType)
+    public async Task StartFileChatStreamingNewAsync(string message, List<ChatFile> files, List<ChatContent> previous)
     {
         ctsFileStreamingNew = new();
 
-        FileChatRequest req = new()
+        ChatRequest req = new()
         {
-            FileStream = fileStream,
-            MediaType = mediaType,
-            Prompt = new(ChatSender.User, message)
+            Previous = previous,
+            Latest = new()
+            {
+                Files = files,
+                Message = new(ChatSender.User, message)
+            },
         };
 
         logger.LogInformation("Streaming started");
