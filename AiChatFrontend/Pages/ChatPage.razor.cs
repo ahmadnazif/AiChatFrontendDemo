@@ -90,7 +90,7 @@ public class ChatPageBase : ComponentBase, IDisposable
                 await using var ms = new MemoryStream();
                 await stream.CopyToAsync(ms);
 
-                ChatFiles.Add(new(ms.ToArray(), file.ContentType));
+                ChatFiles.Add(new(file.Name, ms.ToArray(), file.ContentType));
             }
 
             Toastr.Success($"{ChatFiles.Count} files ready");
