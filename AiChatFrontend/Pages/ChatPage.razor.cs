@@ -119,7 +119,6 @@ public class ChatPageBase : ComponentBase, IDisposable
             SentTime = DateTime.Now
         });
 
-        //var prev = ChatHelper.BuildPreviousMessages([.. ChatCache.ChatLogs.Values]);
         var prev = ChatHelper.BuildPreviousMessagesNew([.. ChatCache.ChatLogsNew.Values]);
 
         IsStreamingCompleted = false;

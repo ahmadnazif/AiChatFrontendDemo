@@ -109,6 +109,28 @@ public static class ChatHelper
         return new(text);
     }
 
+    public static MarkupString GetMessageText(ChatLogNew log)
+    {
+        var unescape = Regex.Unescape(log.Message.Text);
+        var text = MarkdownHelper.ConvertToHtml(unescape);
+
+        if (log.Files.Count > 0)
+        {
+            text += "<hr />";
+            text += $"<i>{log.Files.Count} {(log.Files.Count > 1 ? "attachments" : "attachment")}:</i>";
+
+            List<string> li = [];
+            foreach (var f in log.Files)
+            {
+                li.Add($"<li>{f.Filename} ({f.MediaType})</li>");
+            }
+
+            text += $"<ul>{string.Join(" ", li)}</li>";
+        }
+
+        return new(text);
+    }
+
     public static string GetChatFooter(ChatLog msg)
     {
         return msg.Message.Sender switch
