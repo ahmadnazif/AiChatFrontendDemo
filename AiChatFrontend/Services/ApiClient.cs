@@ -110,6 +110,49 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
 
     #endregion
 
+    #region embedding/text
+    public const string EMBEDDING_TEXT = "embedding/text";
+
+    public async Task<List<TextVector>> ListAllTextVectorFromCacheAsync()
+    {
+        try
+        {
+            var httpClient = fac.CreateClient(NAME);
+            var response = await httpClient.GetAsync($"{EMBEDDING_TEXT}/list-all-from-cache");
+
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadFromJsonAsync<List<TextVector>>();
+            else
+                return [];
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.Message);
+            return [];
+        }
+    }
+
+    public async Task<response<TextVector>> ListAllTextVectorFromCacheAsync()
+    {
+        try
+        {
+            var httpClient = fac.CreateClient(NAME);
+            var response = await httpClient.GetAsync($"{EMBEDDING_TEXT}/list-all-from-cache");
+
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadFromJsonAsync<List<TextVector>>();
+            else
+                return [];
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.Message);
+            return [];
+        }
+    }
+
+    #endregion
+
     #region /app-info
     public const string APPINFO = "app-info";
     public async Task<object> GetAiRuntimeInfoAsync()

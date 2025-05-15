@@ -1,0 +1,46 @@
+﻿@page "/text-similarity"
+@inherits TextSimilarityPageBase
+
+    <h3>Text Similarity Analysis</h3>
+    <h6>A text will be transformed into embedding vector by embedding model, then stored in in memory vector database for analysis</h6>
+
+    <br />
+    <br />
+    <h5>Step 1: Feed to vector database</h5>
+    <label class="mb-3">This text will be stored to in-memory vector database</label>
+    <div class="row">
+        <div class="col">
+            <div class="input-group">
+                <input class="form-control" />
+                <button class="btn btn-success">Upsert</button>
+            </div>
+            <small class="text-muted">Enter text to store to vector DB</small>
+        </div>
+        <div class="col">
+            <table class="table table-bordered table-sm">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Text</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var data in TextVectors)
+                    {
+                        <tr>
+                            <td>@data.Id</td>
+                            <td>@data.Text</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <hr />
+    <h5>Step 2: Enter a query text</h5>
+    <label>This query text will be sent for analysis to check the similarity of it against data stored in vector database</label>
+
+    <hr />
+    <h5>Step 3: Similarity result</h5>
+    <label>Result will be sorted by the most similar meaning against the query text</label>
