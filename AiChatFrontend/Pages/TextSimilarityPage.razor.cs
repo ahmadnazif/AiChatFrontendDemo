@@ -12,16 +12,16 @@ public class TextSimilarityPageBase : ComponentBase
     protected string TextModelName { get; set; } = "Getting..";
     protected List<TextVector> TextVectors { get; set; } = [];
     protected List<TextSimilarityResult> TextSimilarityResults { get; set; } = [];
-    protected string TextToStore { get; set; } = null;
     protected bool IsStoring { get; set; } = false;
-    protected string TextToCompare { get; set; } = null;
+    protected string TextToStore { get; set; } = null;
     protected bool IsComparing { get; set; } = false;
-    protected bool IsAutopopulating { get; set; } = false;
+    protected bool IsAutoPopulating { get; set; } = false;
+    protected string TextToCompare { get; set; } = null;
     protected string ButtonLabelStore => IsStoring ? "Upserting.." : "Upsert";
     protected string ButtonLabelCompare => IsComparing ? "Processing.." : "Process";
-    protected string ButtonLabelAutopopulateStatement => IsAutopopulating ? "Generating.." : "Generate";
-    protected int AutoPopulateNumber { get; set; } = 5;
-    protected TextGenerationLength AutoPopulateLength { get; set; } = TextGenerationLength.Short;
+    protected string ButtonLabelAutoPopulate => IsAutoPopulating ? "Generating.." : "Generate";
+    protected AutoPopulateStatementRequest AutoPopulateRequest { get; set; } = new() { Number = 5, Length = TextGenerationLength.Shortest };
+
     protected override async Task OnInitializedAsync()
     {
         await RefreshTextVectorAsync();
@@ -69,15 +69,9 @@ public class TextSimilarityPageBase : ComponentBase
 
     protected async Task AutoPopulateStatementAsync()
     {
-        IsAutopopulating = true;
+        IsAutoPopulating = true;
 
-        AutoPopulateStatementRequest req = new()
-        {
-            Number = AutoPopulateNumber,
-            Length = AutoPopulateLength
-        };
-
-        var resp = await Api.AutoPopulateStatementToDbAsync(req);
+        var resp = await Api.AutoPopulateStatementToDbAsync(AutoPopulateRequest);
         if (resp.IsSuccess)
         {
             Toastr.Success(resp.Message);
@@ -86,7 +80,7 @@ public class TextSimilarityPageBase : ComponentBase
         else
             Toastr.Error(resp.Message);
 
-        IsAutopopulating = false;
+        IsAutoPopulating = false;
     }
 
 

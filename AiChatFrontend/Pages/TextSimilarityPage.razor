@@ -12,7 +12,10 @@
     </ul>
 </div>
 <h3><strong>Simple RAG:</strong> Text Similarity Analysis</h3>
-<h6>A text will be transformed into embedding vector by embedding model, then stored in vector database for analysis</h6>
+<h6>
+    A text will be transformed into embedding vector using <code>@EmbeddingModelName</code>, then stored in vector database for further analysis.
+    The result is solely obtained from vector database and not further processed to <code>@TextModelName</code>
+</h6>
 
 <br />
 <br />
@@ -38,17 +41,17 @@
                     Option 2: Auto populate statement via Ollama model
                     <div class="input-group">
                         <span class="input-group-text">@TextModelName</span>
-                        <select class="form-select" @bind="AutoPopulateNumber">
-                            <option value="5">Generate 5 statements</option>
-                            <option value="15">Generate 15 statements</option>
-                            <option value="30">Generate 30 statements</option>
+                        <select class="form-select" @bind="AutoPopulateRequest.Number">
+                            <option value="5">Generate 5</option>
+                            <option value="15">Generate 15</option>
+                            <option value="30">Generate 30</option>
                         </select>
-                        <select class="form-select" @bind="AutoPopulateLength">
+                        <select class="form-select" @bind="AutoPopulateRequest.Length">
                             <option value="@TextGenerationLength.Shortest">Very short statements</option>
                             <option value="@TextGenerationLength.Short">Short statements</option>
                             <option value="@TextGenerationLength.Long">Long statement</option>
                         </select>
-                        <button class="btn btn-success" @onclick="async() => await AutoPopulateStatementAsync()" disabled="@IsAutopopulating">@ButtonLabelAutopopulateStatement</button>
+                        <button class="btn btn-success" @onclick="async() => await AutoPopulateStatementAsync()" disabled="@IsAutoPopulating">@ButtonLabelAutoPopulate</button>
                     </div>
                 </div>
             </div>
