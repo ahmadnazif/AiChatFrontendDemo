@@ -132,22 +132,22 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         }
     }
 
-    public async Task<response<TextVector>> ListAllTextVectorFromCacheAsync()
+    public async Task<ResponseBase> FeedTextVectorDbAsync(string text)
     {
         try
         {
             var httpClient = fac.CreateClient(NAME);
-            var response = await httpClient.GetAsync($"{EMBEDDING_TEXT}/list-all-from-cache");
+            var response = await httpClient.PostAsJsonAsync($"{EMBEDDING_TEXT}/feed", text);
 
             if (response.IsSuccessStatusCode)
-                return await response.Content.ReadFromJsonAsync<List<TextVector>>();
+                return await response.Content.ReadFromJsonAsync<ResponseBase>();
             else
-                return [];
+                return new() { IsSuccess = false, Message = response.StatusCode.ToString() };
         }
         catch (Exception ex)
         {
             logger.LogError(ex.Message);
-            return [];
+            return new() { IsSuccess = false, Message = ex.Message };
         }
     }
 
