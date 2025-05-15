@@ -8,7 +8,9 @@ public class TextSimilarityPageBase : ComponentBase
 {
     [Inject] public ApiClient Api { get; set; }
     [Inject] public IToaster Toastr { get; set; }
+    protected string EmbeddingModelName { get; set; } = "Getting..";
     protected List<TextVector> TextVectors { get; set; } = [];
+    protected List<TextSimilarityResult> TextSimilarityResults { get; set; } = [];
     protected string TextToStore { get; set; } = null;
     protected bool IsStoring { get; set; } = false;
     protected string TextToCompare { get; set; } = null;
@@ -22,6 +24,7 @@ public class TextSimilarityPageBase : ComponentBase
 
     private async Task RefreshTextVectorAsync()
     {
+        EmbeddingModelName = await Api.GetEmbeddingModelNameAsync();
         TextVectors = await Api.ListAllTextVectorFromCacheAsync();
     }
 
@@ -67,14 +70,14 @@ public class TextSimilarityPageBase : ComponentBase
         }
 
         IsComparing = true;
-        //var resp = await Api.StoreTextVectorToDbAsync(TextToStore);
-        //if (resp.IsSuccess)
-        //{
-        //    Toastr.Success(resp.Message);
-        //    await RefreshTextVectorAsync();
-        //}
-        //else
-        //    Toastr.Error(resp.Message);
+
+        TextSimilarityResults.Clear();
+        var result = Api.StreamTextVectorSimilarityAsync(TextToCompare);
+        await foreach(var r in result)
+        {
+            TextSimilarityResults.Add(r);
+            StateHasChanged();
+        }
 
         IsComparing = false;
     }

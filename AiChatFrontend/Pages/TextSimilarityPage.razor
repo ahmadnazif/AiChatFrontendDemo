@@ -1,20 +1,30 @@
 ﻿@page "/text-similarity"
 @inherits TextSimilarityPageBase
 
-<h3>Text Similarity Analysis</h3>
-<h6>A text will be transformed into embedding vector by embedding model, then stored in in memory vector database for analysis</h6>
+<div class="alert alert-info">
+    Text vector is stored to in-memory vector database via <a href="https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/out-of-the-box-connectors/inmemory-connector?pivots=programming-language-csharp" target="_blank">Semantic Kernel In-Memory connector (preview version)</a>.
+    When backend API is restarted, stored vector data is gone. 
+    <ul>
+        <li>Embeddng model: <code>@EmbeddingModelName</code></li>
+        <li>Embedding generator: Ollama Embedding Generator via <code> Microsoft.Extensions.AI</code> library (also preview version)</li>
+        <li>Distance function: Cosine Similarity</li>
+        <li>Index kind: HNSW</li>
+    </ul>
+</div>
+<h3><strong>Simple RAG:</strong> Text Similarity Analysis</h3>
+<h6>A text will be transformed into embedding vector by embedding model, then stored in vector database for analysis</h6>
 
 <br />
 <br />
-<h5>Step 1: Feed to vector database</h5>
-<label class="mb-3">This text will be stored to in-memory vector database</label>
+<h5><strong>Step 1:</strong> Feed to vector database</h5>
+<label class="mb-3">This text will be stored to vector database</label>
 <div class="row">
     <div class="col-sm-4">
         <div class="input-group">
-            <input class="form-control" @bind="TextToStore" />
+            <input class="form-control" placeholder="Enter text to store" @bind="TextToStore" />
             <button class="btn btn-success" @onclick="async() => await StoreTextAsync()" disabled="@IsStoring">@ButtonLabelStore</button>
         </div>
-        <small class="text-muted">Enter text to store to vector DB</small>
+        <small class="text-muted">Enter text to store</small>
     </div>
     <div class="col">
         <table class="table table-bordered table-sm">
@@ -51,17 +61,58 @@
 </div>
 
 <hr />
-<h5>Step 2: Enter a comparison text</h5>
+<h5><strong>Step 2:</strong> Enter a comparison text</h5>
 <label class="mb-3">This text will be sent for analysis to check the similarity of it against data stored in vector database</label>
 <div class="row">
     <div class="col-sm-4">
         <div class="input-group">
-            <input class="form-control" @bind="TextToCompare" />
+            <input class="form-control" placeholder="Enter a comparison text" @bind="TextToCompare" />
             <button class="btn btn-success" @onclick="async() => await CompareTextAsync()" disabled="@IsComparing">@ButtonLabelCompare</button>
         </div>
+        <small class="text-muted">Enter a comparison text</small>
     </div>
 </div>
 
 <hr />
-<h5>Step 3: Similarity result</h5>
-<label>Result will be sorted by the most similar meaning against the query text</label>
+<h5><strong>Step 3:</strong> Similarity result</h5>
+<label class="mb-3">Result will be sorted by the most similar meaning against the query text</label>
+<div class="row">
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input class="form-control" @bind="TextToCompare" readonly />
+        </div>
+        <small class="text-muted">The text to compare against vector database</small>
+    </div>
+    <div class="col">
+        <div class="col">
+            <table class="table table-bordered table-sm">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Text</th>
+                        <th>ID</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (TextSimilarityResults.Count == 0)
+                    {
+                        <span>
+                            <label><i>No result yet</i></label>
+                        </span>
+                    }
+                    else
+                    {
+                        foreach (var data in TextSimilarityResults)
+                        {
+                            <tr>
+                                <td><strong>@data.Text</strong></td>
+                                <td>@data.Guid</td>
+                                <td>@data.Score</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

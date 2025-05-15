@@ -111,7 +111,26 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
     #endregion
 
     #region embedding/text
-    public const string EMBEDDING_TEXT = "embedding/text";
+    public const string EMBEDDING = "embedding";
+    public const string EMBEDDING_TEXT = $"{EMBEDDING}/text";
+    public async Task<string> GetEmbeddingModelNameAsync()
+    {
+        try
+        {
+            var httpClient = fac.CreateClient(NAME);
+            var response = await httpClient.GetAsync($"{EMBEDDING}/get-model-name");
+
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadAsStringAsync();
+            else
+                return null;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.Message);
+            return null;
+        }
+    }
 
     public async Task<List<TextVector>> ListAllTextVectorFromCacheAsync()
     {
@@ -170,22 +189,14 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         }
     }
 
-    public async IAsyncEnumerable<ResponseBase> StoreTextVectorToDbAsync(string text)
+    public async IAsyncEnumerable<TextSimilarityResult> StreamTextVectorSimilarityAsync(string text)
     {
-        try
-        {
-            var httpClient = fac.CreateClient(NAME);
-            var response = await httpClient.PostAsJsonAsync($"{EMBEDDING_TEXT}/feed", text);
+        var httpClient = fac.CreateClient(NAME);
+        var results = httpClient.GetFromJsonAsAsyncEnumerable<TextSimilarityResult>($"{EMBEDDING_TEXT}/query-similarity?text={text}");
 
-            if (response.IsSuccessStatusCode)
-                return await response.Content.ReadFromJsonAsync<ResponseBase>();
-            else
-                return new() { IsSuccess = false, Message = response.StatusCode.ToString() };
-        }
-        catch (Exception ex)
+        await foreach (var r in results)
         {
-            logger.LogError(ex.Message);
-            return new() { IsSuccess = false, Message = ex.Message };
+            yield return r;
         }
     }
 
