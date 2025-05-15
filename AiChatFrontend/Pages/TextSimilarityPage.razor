@@ -43,6 +43,11 @@
                             <option value="15">Generate 15 statements</option>
                             <option value="30">Generate 30 statements</option>
                         </select>
+                        <select class="form-select" @bind="AutoPopulateLength">
+                            <option value="@TextGenerationLength.Shortest">Very short statements</option>
+                            <option value="@TextGenerationLength.Short">Short statements</option>
+                            <option value="@TextGenerationLength.Long">Long statement</option>
+                        </select>
                         <button class="btn btn-success" @onclick="async() => await AutoPopulateStatementAsync()" disabled="@IsAutopopulating">@ButtonLabelAutopopulateStatement</button>
                     </div>
                 </div>

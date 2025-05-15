@@ -21,6 +21,7 @@ public class TextSimilarityPageBase : ComponentBase
     protected string ButtonLabelCompare => IsComparing ? "Processing.." : "Process";
     protected string ButtonLabelAutopopulateStatement => IsAutopopulating ? "Generating.." : "Generate";
     protected int AutoPopulateNumber { get; set; } = 5;
+    protected TextGenerationLength AutoPopulateLength { get; set; } = TextGenerationLength.Short;
     protected override async Task OnInitializedAsync()
     {
         await RefreshTextVectorAsync();
@@ -69,7 +70,14 @@ public class TextSimilarityPageBase : ComponentBase
     protected async Task AutoPopulateStatementAsync()
     {
         IsAutopopulating = true;
-        var resp = await Api.AutoPopulateStatementToDbAsync(AutoPopulateNumber);
+
+        AutoPopulateStatementRequest req = new()
+        {
+            Number = AutoPopulateNumber,
+            Length = AutoPopulateLength
+        };
+
+        var resp = await Api.AutoPopulateStatementToDbAsync(req);
         if (resp.IsSuccess)
         {
             Toastr.Success(resp.Message);

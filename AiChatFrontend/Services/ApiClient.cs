@@ -170,12 +170,12 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         }
     }
 
-    public async Task<ResponseBase> AutoPopulateStatementToDbAsync(int number, TextGenerationDifficultyLevel level)
+    public async Task<ResponseBase> AutoPopulateStatementToDbAsync(AutoPopulateStatementRequest req)
     {
         try
         {
             var httpClient = fac.CreateClient(NAME);
-            var response = await httpClient.PostAsJsonAsync($"{EMBEDDING_TEXT}/auto-populate", number);
+            var response = await httpClient.PostAsJsonAsync($"{EMBEDDING_TEXT}/auto-populate", req);
 
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadFromJsonAsync<ResponseBase>();
