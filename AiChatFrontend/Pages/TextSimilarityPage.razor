@@ -3,7 +3,7 @@
 
 <div class="alert alert-info">
     Text vector is stored to in-memory vector database via <a href="https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/out-of-the-box-connectors/inmemory-connector?pivots=programming-language-csharp" target="_blank">Semantic Kernel In-Memory connector (preview version)</a>.
-    When backend API is restarted, stored vector data is gone. 
+    When backend API is restarted, stored vector data is gone.
     <ul>
         <li>Embeddng model: <code>@EmbeddingModelName</code></li>
         <li>Embedding generator: Ollama Embedding Generator via <code> Microsoft.Extensions.AI</code> library (also preview version)</li>
@@ -19,12 +19,36 @@
 <h5><strong>Step 1:</strong> Feed to vector database</h5>
 <label class="mb-3">This text will be stored to vector database</label>
 <div class="row">
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input class="form-control" placeholder="Enter text to store" @bind="TextToStore" />
-            <button class="btn btn-success" @onclick="async() => await StoreTextAsync()" disabled="@IsStoring">@ButtonLabelStore</button>
+    <div class="col-sm-5">
+        <div class="row mb-2">
+            <div class="col">
+                <div class="card card-body">
+                    Option 1: Enter your statement text
+                    <div class="input-group">
+                        <input class="form-control" placeholder="Enter text to store" @bind="TextToStore" />
+                        <button class="btn btn-success" @onclick="async() => await StoreTextAsync()" disabled="@IsStoring">@ButtonLabelStore</button>
+                    </div>
+                    @*<small class="text-muted">Enter text to store</small>*@
+                </div>
+            </div>
         </div>
-        <small class="text-muted">Enter text to store</small>
+        <div class="row">
+            <div class="col">
+                <div class="card card-body">
+                    Option 2: Auto populate statement via Ollama model
+                    <div class="input-group">
+                        <span class="input-group-text">@TextModelName</span>
+                        <select class="form-select" @bind="AutoPopulateNumber">
+                            <option value="5">Generate 5 statements</option>
+                            <option value="15">Generate 15 statements</option>
+                            <option value="30">Generate 30 statements</option>
+                        </select>
+                        <button class="btn btn-success" @onclick="async() => await AutoPopulateStatementAsync()" disabled="@IsAutopopulating">@ButtonLabelAutopopulateStatement</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
     <div class="col">
         <table class="table table-bordered table-sm">
@@ -61,7 +85,7 @@
 </div>
 
 <hr />
-<h5><strong>Step 2:</strong> Enter a comparison text</h5>
+<h5><strong>Step 2:</strong> Enter a simple statement text</h5>
 <label class="mb-3">This text will be sent for analysis to check the similarity of it against data stored in vector database</label>
 <div class="row">
     <div class="col-sm-4">

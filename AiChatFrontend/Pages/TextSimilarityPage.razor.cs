@@ -9,14 +9,18 @@ public class TextSimilarityPageBase : ComponentBase
     [Inject] public ApiClient Api { get; set; }
     [Inject] public IToaster Toastr { get; set; }
     protected string EmbeddingModelName { get; set; } = "Getting..";
+    protected string TextModelName { get; set; } = "Getting..";
     protected List<TextVector> TextVectors { get; set; } = [];
     protected List<TextSimilarityResult> TextSimilarityResults { get; set; } = [];
     protected string TextToStore { get; set; } = null;
     protected bool IsStoring { get; set; } = false;
     protected string TextToCompare { get; set; } = null;
     protected bool IsComparing { get; set; } = false;
+    protected bool IsAutopopulating { get; set; } = false;
     protected string ButtonLabelStore => IsStoring ? "Upserting.." : "Upsert";
     protected string ButtonLabelCompare => IsComparing ? "Processing.." : "Process";
+    protected string ButtonLabelAutopopulateStatement => IsAutopopulating ? "Generating.." : "Generate";
+    protected int AutoPopulateNumber { get; set; } = 5;
     protected override async Task OnInitializedAsync()
     {
         await RefreshTextVectorAsync();
@@ -24,7 +28,8 @@ public class TextSimilarityPageBase : ComponentBase
 
     private async Task RefreshTextVectorAsync()
     {
-        EmbeddingModelName = await Api.GetEmbeddingModelNameAsync();
+        EmbeddingModelName = await Api.GetModelNameAsync(LlmModelType.Embedding);
+        TextModelName = await Api.GetModelNameAsync(LlmModelType.Text);
         TextVectors = await Api.ListAllTextVectorFromCacheAsync();
     }
 
@@ -61,6 +66,22 @@ public class TextSimilarityPageBase : ComponentBase
             Toastr.Error(resp.Message);
     }
 
+    protected async Task AutoPopulateStatementAsync()
+    {
+        IsAutopopulating = true;
+        var resp = await Api.AutoPopulateStatementToDbAsync(AutoPopulateNumber);
+        if (resp.IsSuccess)
+        {
+            Toastr.Success(resp.Message);
+            await RefreshTextVectorAsync();
+        }
+        else
+            Toastr.Error(resp.Message);
+
+        IsAutopopulating = false;
+    }
+
+
     protected async Task CompareTextAsync()
     {
         if (string.IsNullOrWhiteSpace(TextToCompare))
@@ -73,7 +94,7 @@ public class TextSimilarityPageBase : ComponentBase
 
         TextSimilarityResults.Clear();
         var result = Api.StreamTextVectorSimilarityAsync(TextToCompare);
-        await foreach(var r in result)
+        await foreach (var r in result)
         {
             TextSimilarityResults.Add(r);
             StateHasChanged();

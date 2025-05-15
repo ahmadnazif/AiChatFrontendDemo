@@ -113,12 +113,12 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
     #region embedding/text
     public const string EMBEDDING = "embedding";
     public const string EMBEDDING_TEXT = $"{EMBEDDING}/text";
-    public async Task<string> GetEmbeddingModelNameAsync()
+    public async Task<string> GetModelNameAsync(LlmModelType type)
     {
         try
         {
             var httpClient = fac.CreateClient(NAME);
-            var response = await httpClient.GetAsync($"{EMBEDDING}/get-model-name");
+            var response = await httpClient.GetAsync($"{EMBEDDING}/get-model-name?type={type}");
 
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadAsStringAsync();
@@ -157,6 +157,25 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         {
             var httpClient = fac.CreateClient(NAME);
             var response = await httpClient.PostAsJsonAsync($"{EMBEDDING_TEXT}/feed", text);
+
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadFromJsonAsync<ResponseBase>();
+            else
+                return new() { IsSuccess = false, Message = response.StatusCode.ToString() };
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.Message);
+            return new() { IsSuccess = false, Message = ex.Message };
+        }
+    }
+
+    public async Task<ResponseBase> AutoPopulateStatementToDbAsync(int number, TextGenerationDifficultyLevel level)
+    {
+        try
+        {
+            var httpClient = fac.CreateClient(NAME);
+            var response = await httpClient.PostAsJsonAsync($"{EMBEDDING_TEXT}/auto-populate", number);
 
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadFromJsonAsync<ResponseBase>();
