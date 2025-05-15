@@ -132,7 +132,45 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         }
     }
 
-    public async Task<ResponseBase> FeedTextVectorDbAsync(string text)
+    public async Task<ResponseBase> StoreTextVectorToDbAsync(string text)
+    {
+        try
+        {
+            var httpClient = fac.CreateClient(NAME);
+            var response = await httpClient.PostAsJsonAsync($"{EMBEDDING_TEXT}/feed", text);
+
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadFromJsonAsync<ResponseBase>();
+            else
+                return new() { IsSuccess = false, Message = response.StatusCode.ToString() };
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.Message);
+            return new() { IsSuccess = false, Message = ex.Message };
+        }
+    }
+
+    public async Task<ResponseBase> DeleteTextVectorFromDbAsync(string key)
+    {
+        try
+        {
+            var httpClient = fac.CreateClient(NAME);
+            var response = await httpClient.DeleteAsync($"{EMBEDDING_TEXT}/delete?key={key}");
+
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadFromJsonAsync<ResponseBase>();
+            else
+                return new() { IsSuccess = false, Message = response.StatusCode.ToString() };
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.Message);
+            return new() { IsSuccess = false, Message = ex.Message };
+        }
+    }
+
+    public async IAsyncEnumerable<ResponseBase> StoreTextVectorToDbAsync(string text)
     {
         try
         {

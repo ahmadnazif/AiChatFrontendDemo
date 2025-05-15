@@ -1,46 +1,67 @@
 ﻿@page "/text-similarity"
 @inherits TextSimilarityPageBase
 
-    <h3>Text Similarity Analysis</h3>
-    <h6>A text will be transformed into embedding vector by embedding model, then stored in in memory vector database for analysis</h6>
+<h3>Text Similarity Analysis</h3>
+<h6>A text will be transformed into embedding vector by embedding model, then stored in in memory vector database for analysis</h6>
 
-    <br />
-    <br />
-    <h5>Step 1: Feed to vector database</h5>
-    <label class="mb-3">This text will be stored to in-memory vector database</label>
-    <div class="row">
-        <div class="col">
-            <div class="input-group">
-                <input class="form-control" />
-                <button class="btn btn-success">Upsert</button>
-            </div>
-            <small class="text-muted">Enter text to store to vector DB</small>
+<br />
+<br />
+<h5>Step 1: Feed to vector database</h5>
+<label class="mb-3">This text will be stored to in-memory vector database</label>
+<div class="row">
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input class="form-control" @bind="TextToStore" />
+            <button class="btn btn-success" @onclick="async() => await StoreTextAsync()" disabled="@IsStoring">@ButtonLabelStore</button>
         </div>
-        <div class="col">
-            <table class="table table-bordered table-sm">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Text</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var data in TextVectors)
+        <small class="text-muted">Enter text to store to vector DB</small>
+    </div>
+    <div class="col">
+        <table class="table table-bordered table-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>Action</th>
+                    <th>Text</th>
+                    <th>ID</th>
+                    <th>Vector Dimension</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (TextVectors.Count == 0)
+                {
+                    <span>
+                        <label><i>No data in vector database</i></label>
+                    </span>
+                }
+                else
+                {
+                    foreach (var data in TextVectors)
                     {
                         <tr>
+                            <td><button class="btn btn-sm btn-danger" @onclick="async () => await DeleteTextAsync(data.Id)">Delete</button></td>
+                            <td><strong>@data.Text</strong></td>
                             <td>@data.Id</td>
-                            <td>@data.Text</td>
+                            <td>@data.Vector.Length</td>
                         </tr>
                     }
-                </tbody>
-            </table>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<hr />
+<h5>Step 2: Enter a comparison text</h5>
+<label class="mb-3">This text will be sent for analysis to check the similarity of it against data stored in vector database</label>
+<div class="row">
+    <div class="col-sm-4">
+        <div class="input-group">
+            <input class="form-control" @bind="TextToCompare" />
+            <button class="btn btn-success" @onclick="async() => await CompareTextAsync()" disabled="@IsComparing">@ButtonLabelCompare</button>
         </div>
     </div>
+</div>
 
-    <hr />
-    <h5>Step 2: Enter a query text</h5>
-    <label>This query text will be sent for analysis to check the similarity of it against data stored in vector database</label>
-
-    <hr />
-    <h5>Step 3: Similarity result</h5>
-    <label>Result will be sorted by the most similar meaning against the query text</label>
+<hr />
+<h5>Step 3: Similarity result</h5>
+<label>Result will be sorted by the most similar meaning against the query text</label>

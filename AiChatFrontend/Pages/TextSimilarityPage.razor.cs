@@ -1,14 +1,82 @@
 ﻿using AiChatFrontend.Services;
 using Microsoft.AspNetCore.Components;
+using Sotsera.Blazor.Toaster;
 
 namespace AiChatFrontend.Pages;
 
 public class TextSimilarityPageBase : ComponentBase
 {
     [Inject] public ApiClient Api { get; set; }
+    [Inject] public IToaster Toastr { get; set; }
     protected List<TextVector> TextVectors { get; set; } = [];
+    protected string TextToStore { get; set; } = null;
+    protected bool IsStoring { get; set; } = false;
+    protected string TextToCompare { get; set; } = null;
+    protected bool IsComparing { get; set; } = false;
+    protected string ButtonLabelStore => IsStoring ? "Upserting.." : "Upsert";
+    protected string ButtonLabelCompare => IsComparing ? "Processing.." : "Process";
     protected override async Task OnInitializedAsync()
+    {
+        await RefreshTextVectorAsync();
+    }
+
+    private async Task RefreshTextVectorAsync()
     {
         TextVectors = await Api.ListAllTextVectorFromCacheAsync();
     }
+
+    protected async Task StoreTextAsync()
+    {
+        if (string.IsNullOrWhiteSpace(TextToStore))
+        {
+            Toastr.Warning("Text to feed is required");
+            return;
+        }
+
+        IsStoring = true;
+        var resp = await Api.StoreTextVectorToDbAsync(TextToStore);
+        if (resp.IsSuccess)
+        {
+            Toastr.Success(resp.Message);
+            await RefreshTextVectorAsync();
+        }
+        else
+            Toastr.Error(resp.Message);
+
+        IsStoring = false;
+    }
+
+    protected async Task DeleteTextAsync(Guid key)
+    {
+        var resp = await Api.DeleteTextVectorFromDbAsync(key.ToString());
+        if (resp.IsSuccess)
+        {
+            Toastr.Success($"Item {key} deleted");
+            await RefreshTextVectorAsync();
+        }
+        else
+            Toastr.Error(resp.Message);
+    }
+
+    protected async Task CompareTextAsync()
+    {
+        if (string.IsNullOrWhiteSpace(TextToCompare))
+        {
+            Toastr.Warning("Text to compare is required");
+            return;
+        }
+
+        IsComparing = true;
+        //var resp = await Api.StoreTextVectorToDbAsync(TextToStore);
+        //if (resp.IsSuccess)
+        //{
+        //    Toastr.Success(resp.Message);
+        //    await RefreshTextVectorAsync();
+        //}
+        //else
+        //    Toastr.Error(resp.Message);
+
+        IsComparing = false;
+    }
+
 }
