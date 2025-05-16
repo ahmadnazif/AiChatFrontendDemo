@@ -20,4 +20,7 @@ This is a Blazor WebAssembly standalone app, that connected to AI Chat Backend a
 - Backend API server (AiChatBackend) must be running in order this app to work.
 - 2 types of chatting is implemented:
   - Single chat: Fire and forget chat. Previous conversations is not attached when sending data to backend API. The backend is only response on current prompt.
-  - Chained chat: All previous conversation is attached and sent to backend API, so the model can read & inference on previous response then respond accordingly.
+  - Streaming text chat.
+  - Streaming text chat with attachment
+  - RAG: Text similarity analysis with in-memory vector database
+  - RAG: Recipe analysis with Qdrant database (upcoming)
