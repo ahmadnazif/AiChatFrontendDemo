@@ -14,7 +14,7 @@
 <h3><strong>Simple RAG:</strong> Text Similarity Analysis</h3>
 <h6>
     A text will be transformed into embedding vector using <code>@EmbeddingModelName</code>, then stored in vector database for further analysis.
-    The result is solely obtained from vector database and not further processed to <code>@TextModelName</code>
+    The result is solely obtained from vector database and not further processed to <code>@MultimodalModelName</code>
 </h6>
 
 <br />
@@ -40,7 +40,7 @@
                 <div class="card card-body">
                     Option 2: Auto populate statement via Ollama model
                     <div class="input-group">
-                        <span class="input-group-text">@TextModelName</span>
+                        <span class="input-group-text">@MultimodalModelName</span>
                         <select class="form-select" @bind="AutoPopulateRequest.Number">
                             <option value="5">Generate 5</option>
                             <option value="15">Generate 15</option>

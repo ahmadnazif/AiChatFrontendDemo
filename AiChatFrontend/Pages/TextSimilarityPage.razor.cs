@@ -10,6 +10,7 @@ public class TextSimilarityPageBase : ComponentBase
     [Inject] public IToaster Toastr { get; set; }
     protected string EmbeddingModelName { get; set; } = "Getting..";
     protected string TextModelName { get; set; } = "Getting..";
+    protected string MultimodalModelName { get; set; } = "Getting..";
     protected List<TextVector> TextVectors { get; set; } = [];
     protected List<TextSimilarityResult> TextSimilarityResults { get; set; } = [];
     protected bool IsStoring { get; set; } = false;
@@ -31,6 +32,7 @@ public class TextSimilarityPageBase : ComponentBase
     {
         EmbeddingModelName = await Api.GetModelNameAsync(LlmModelType.Embedding);
         TextModelName = await Api.GetModelNameAsync(LlmModelType.Text);
+        MultimodalModelName = await Api.GetModelNameAsync(LlmModelType.Multimodal);
         TextVectors = await Api.ListAllTextVectorFromCacheAsync();
     }
 
