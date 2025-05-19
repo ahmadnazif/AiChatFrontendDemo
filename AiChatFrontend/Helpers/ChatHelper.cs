@@ -201,4 +201,6 @@ public static class ChatHelper
             previous[streamingId] = current;
         }
     }
+
+    public static List<string> Topics => ["Astronomy", "Science", "Technology", "Culinary", "Sports", "Mathematics", "Science Fiction"];
 }

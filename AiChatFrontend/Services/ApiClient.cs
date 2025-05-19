@@ -113,6 +113,25 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
     #region embedding/text
     public const string EMBEDDING = "embedding";
     public const string EMBEDDING_TEXT = $"{EMBEDDING}/text";
+    public async Task<Dictionary<LlmModelType, string>> GetModelsDictionaryAsync()
+    {
+        try
+        {
+            var httpClient = fac.CreateClient(NAME);
+            var response = await httpClient.GetAsync($"{EMBEDDING}/get-models-dictionary");
+
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadFromJsonAsync<Dictionary<LlmModelType, string>>();
+            else
+                return [];
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.Message);
+            return [];
+        }
+    }
+
     public async Task<string> GetModelNameAsync(LlmModelType type)
     {
         try

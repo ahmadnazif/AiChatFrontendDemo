@@ -8,6 +8,7 @@ public class TextSimilarityPageBase : ComponentBase
 {
     [Inject] public ApiClient Api { get; set; }
     [Inject] public IToaster Toastr { get; set; }
+    protected Dictionary<LlmModelType, string> Models { get; set; } = [];
     protected string EmbeddingModelName { get; set; } = "Getting..";
     protected string TextModelName { get; set; } = "Getting..";
     protected string MultimodalModelName { get; set; } = "Getting..";
@@ -20,19 +21,32 @@ public class TextSimilarityPageBase : ComponentBase
     protected string TextToCompare { get; set; } = null;
     protected string ButtonLabelStore => IsStoring ? "Upserting.." : "Upsert";
     protected string ButtonLabelCompare => IsComparing ? "Processing.." : "Process";
-    protected string ButtonLabelAutoPopulate => IsAutoPopulating ? "Generating.." : "Generate";
-    protected AutoPopulateStatementRequest AutoPopulateRequest { get; set; } = new() { Number = 5, Length = TextGenerationLength.Shortest };
+    protected string ButtonLabelAutoPopulate => IsAutoPopulating ? "Generating.." : "Generate & Upsert";
+    protected AutoPopulateStatementRequest AutoPopulateRequest { get; set; } = new()
+    {
+        ModelId = string.Empty,
+        Number = 5,
+        Length = TextGenerationLength.Shortest,
+        Topic = "Random",
+        Language = "English"
+    };
 
     protected override async Task OnInitializedAsync()
     {
+        await RefreshModelsAsync();
         await RefreshTextVectorAsync();
+    }
+
+    private async Task RefreshModelsAsync()
+    {
+        Models = await Api.GetModelsDictionaryAsync();
+        EmbeddingModelName = Models[LlmModelType.Embedding];
+        TextModelName = Models[LlmModelType.Text];
+        MultimodalModelName = Models[LlmModelType.Multimodal];
     }
 
     private async Task RefreshTextVectorAsync()
     {
-        EmbeddingModelName = await Api.GetModelNameAsync(LlmModelType.Embedding);
-        TextModelName = await Api.GetModelNameAsync(LlmModelType.Text);
-        MultimodalModelName = await Api.GetModelNameAsync(LlmModelType.Multimodal);
         TextVectors = await Api.ListAllTextVectorFromCacheAsync();
     }
 

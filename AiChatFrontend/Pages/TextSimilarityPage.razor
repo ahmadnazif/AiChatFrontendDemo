@@ -23,10 +23,10 @@
 <label class="mb-3">This text will be stored to vector database</label>
 <div class="row">
     <div class="col-sm-5">
-        <div class="row mb-2">
+        <div class="row mb-3">
             <div class="col">
                 <div class="card card-body">
-                    Option 1: Enter your statement text
+                    <div class="mb-2">Option 1: Enter your statement text</div>
                     <div class="input-group">
                         <input class="form-control" placeholder="Enter text to store" @bind="TextToStore" />
                         <button class="btn btn-success" @onclick="async() => await StoreTextAsync()" disabled="@IsStoring">@ButtonLabelStore</button>
@@ -38,21 +38,77 @@
         <div class="row">
             <div class="col">
                 <div class="card card-body">
-                    Option 2: Auto populate statement via Ollama model
-                    <div class="input-group">
-                        <span class="input-group-text">@MultimodalModelName</span>
-                        <select class="form-select" @bind="AutoPopulateRequest.Number">
-                            <option value="5">Generate 5</option>
-                            <option value="15">Generate 15</option>
-                            <option value="30">Generate 30</option>
-                        </select>
-                        <select class="form-select" @bind="AutoPopulateRequest.Length">
-                            <option value="@TextGenerationLength.Shortest">Very short statements</option>
-                            <option value="@TextGenerationLength.Short">Short statements</option>
-                            <option value="@TextGenerationLength.Long">Long statement</option>
-                        </select>
-                        <button class="btn btn-success" @onclick="async() => await AutoPopulateStatementAsync()" disabled="@IsAutoPopulating">@ButtonLabelAutoPopulate</button>
+                    <div class="mb-2">Option 2: Auto populate statement via Ollama model</div>
+                    <div class="row mb-2">
+                        <div class="col">
+                            <label class="text-muted">Model ID</label>
+                            <select class="form-select" @bind="AutoPopulateRequest.ModelId">
+                                <option value="">Default model</option>
+                                @foreach (var model in Models)
+                                {
+                                    <option value="@model.Value">@model.Key (@model.Value)</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label class="text-muted">Generate total</label>
+                            <select class="form-select" @bind="AutoPopulateRequest.Number">
+                                <option value="5">5 statements</option>
+                                <option value="15">15 statements</option>
+                                <option value="30">30 statements</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label class="text-muted">Statement length</label>
+                            <select class="form-select" @bind="AutoPopulateRequest.Length">
+                                <option value="@TextGenerationLength.Shortest">Shortest</option>
+                                <option value="@TextGenerationLength.Short">Normal</option>
+                                <option value="@TextGenerationLength.Long">Long</option>
+                            </select>
+                        </div>
                     </div>
+                    <div class="row mb-2">
+                        <div class="col">
+                            <label class="text-muted">Topic</label>
+                            <select class="form-select" @bind="AutoPopulateRequest.Topic">
+                                <option value="Random">Random</option>
+                                @foreach (var topic in ChatHelper.Topics.Order())
+                                {
+                                    <option value="@topic">@topic</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label class="text-muted">Language</label>
+                            <select class="form-select" @bind="AutoPopulateRequest.Language">
+                                <option value="English">English</option>
+                                <option value="Malay">Malay</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label>&nbsp;</label><br />
+                            <button class="btn btn-success" @onclick="async() => await AutoPopulateStatementAsync()" disabled="@IsAutoPopulating">@ButtonLabelAutoPopulate</button>
+                        </div>
+                    </div>
+                    @*<div class="row">
+                        <div class="col">
+                            <div class="input-group">
+                                <span class="input-group-text">@MultimodalModelName</span>
+                                <select class="form-select" @bind="AutoPopulateRequest.Number">
+                                    <option value="5">Generate 5</option>
+                                    <option value="15">Generate 15</option>
+                                    <option value="30">Generate 30</option>
+                                </select>
+                                <select class="form-select" @bind="AutoPopulateRequest.Length">
+                                    <option value="@TextGenerationLength.Shortest">Very short statements</option>
+                                    <option value="@TextGenerationLength.Short">Short statements</option>
+                                    <option value="@TextGenerationLength.Long">Long statement</option>
+                                </select>
+                                <button class="btn btn-success" @onclick="async() => await AutoPopulateStatementAsync()" disabled="@IsAutoPopulating">@ButtonLabelAutoPopulate</button>
+                            </div>
+                        </div>
+                    </div>*@
+
                 </div>
             </div>
         </div>
