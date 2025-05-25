@@ -47,10 +47,10 @@ public class ChatPageBase : ComponentBase, IDisposable
 
     private async Task RefreshModelsAsync()
     {
-        var text = await Api.GetModelAsync(LlmModelType.Text);
+        var vision = await Api.GetModelAsync(LlmModelType.Vision);
         var multi = await Api.GetModelAsync(LlmModelType.Multimodal);
 
-        ModelIds = [.. text.ModelIds, .. multi.ModelIds];
+        ModelIds = [.. vision.ModelIds, .. multi.ModelIds];
     }
 
     private void OnChatReceived(object sender, StreamingChatReceivedEventArgs e)
@@ -156,13 +156,13 @@ public class ChatPageBase : ComponentBase, IDisposable
             return;
         }
 
-        ChatCache.Clear();
+        ChatCache.ClearNew();
     }
 
     public void Dispose()
     {
         if (!IsStreamingCompleted)
-            ChatCache.Remove(StreamingId);
+            ChatCache.RemoveNew(StreamingId);
 
         Chat.OnStreamingChatReceived -= OnChatReceived;
         GC.SuppressFinalize(this);
