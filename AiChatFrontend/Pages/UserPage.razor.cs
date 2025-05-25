@@ -12,49 +12,26 @@ public class UserPageBase : ComponentBase
     [Inject] public ILogger<UserPageBase> Logger { get; set; }
     [Inject] public SessionCache SessionCache { get; set; }
     [Inject] public IToaster Toastr { get; set; }
-    [Inject] public ApiClient Api { get; set; }
-    [Inject] public ChatService Chat { get; set; }
+    [Inject] public SessionService Session { get; set; }
     protected string Username { get; set; }
 
     protected async Task ConnectAsync()
     {
-        if (!SessionCache.IsAuthenticated)
-        {
-            if (string.IsNullOrWhiteSpace(Username))
-            {
-                Toastr.Error("Username can't be empty");
-                return;
-            }
+        var resp = await Session.ConnectAsync(Username);
 
-            var isRegistered = await Api.IsUserRegisteredAsync(Username);
-
-            if (isRegistered)
-            {
-                Toastr.Error($"User {Username} already registered");
-                return;
-            }
-
-            try
-            {
-                await Chat.ConnectAsync(Username);
-                var session = await Api.GetUserSessionByUsernameAsync(Username);
-                SessionCache.Start(session);
-                Toastr.Success($"Welcome {SessionCache.Session.Username}!");
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex.Message);
-            }
-        }
+        if (!resp.IsSuccess)
+            Toastr.Error(resp.Message);
+        else
+            Toastr.Success(resp.Message);
     }
 
     protected async Task DisconnectAsync()
     {
-        if (SessionCache.IsAuthenticated)
-        {
-            await Chat.StopAsync();
-            SessionCache.Remove();
-            Username = null;
-        }
+        var resp = await Session.DisconnectAsync();
+
+        if (!resp.IsSuccess)
+            Toastr.Error(resp.Message);
+        else
+            Toastr.Success(resp.Message);
     }
 }

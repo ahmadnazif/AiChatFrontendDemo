@@ -18,6 +18,7 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddSingleton<SessionCache>();
+builder.Services.AddScoped<SessionService>();
 builder.Services.AddSingleton<ChatCache>();
 builder.Services.AddSingleton<FileChatCache>();
 builder.Services.AddScoped<ChatServiceOld>();

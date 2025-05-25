@@ -15,6 +15,7 @@ public class StreamingChatPageBase : ComponentBase, IDisposable
     [Inject] public ApiClient Api { get; set; }
     [Inject] public SessionCache SessionCache { get; set; }
     [Inject] public ChatCache ChatCache { get; set; }
+    [Inject] public SessionService Session { get; set; }
     protected bool IsApiConnected { get; set; }
     protected List<string> ModelIds { get; set; } = [];
     protected string ModelId { get; set; }
@@ -29,6 +30,8 @@ public class StreamingChatPageBase : ComponentBase, IDisposable
         IsApiConnected = await Api.IsConnectedAsync();
         try
         {
+            var tempUsername = Guid.NewGuid().ToString().Split("-")[0];
+            await Session.ConnectAsync(tempUsername);
             await RefreshModelsAsync();
             Chat.OnStreamingChatReceived += OnStreamingChatReceived;
         }
