@@ -16,7 +16,10 @@ public class ChatPageBase : ComponentBase, IDisposable
     [Inject] public ApiClient Api { get; set; }
     [Inject] public SessionCache SessionCache { get; set; }
     [Inject] public FileChatCache ChatCache { get; set; }
+    [Inject] public SessionService Session { get; set; }
     protected bool IsApiConnected { get; set; }
+    protected List<string> ModelIds { get; set; } = [];
+    protected string ModelId { get; set; }
     protected bool IsStreamingCompleted { get; set; } = true;
     protected string StreamingId { get; set; }
     protected Stopwatch StreamingSw { get; set; } = new Stopwatch();
@@ -29,6 +32,9 @@ public class ChatPageBase : ComponentBase, IDisposable
         IsApiConnected = await Api.IsConnectedAsync();
         try
         {
+            var tempUsername = Guid.NewGuid().ToString().Split("-")[0];
+            await Session.ConnectAsync(tempUsername);
+            await RefreshModelsAsync();
             Chat.OnChatReceived += OnChatReceived;
         }
         catch (Exception ex)
@@ -37,6 +43,14 @@ public class ChatPageBase : ComponentBase, IDisposable
             LogError(ex.Message);
             Toastr.Error(ex.Message);
         }
+    }
+
+    private async Task RefreshModelsAsync()
+    {
+        var text = await Api.GetModelAsync(LlmModelType.Text);
+        var multi = await Api.GetModelAsync(LlmModelType.Multimodal);
+
+        ModelIds = [.. text.ModelIds, .. multi.ModelIds];
     }
 
     private void OnChatReceived(object sender, StreamingChatReceivedEventArgs e)
@@ -124,7 +138,7 @@ public class ChatPageBase : ComponentBase, IDisposable
         IsStreamingCompleted = false;
         Log($"[SENT] {SessionCache.Session.Username}: {NewMessage}");
 
-        await Chat.StartStreamingAsync(NewMessage, ChatFiles, prev);
+        await Chat.StartStreamingAsync(NewMessage, ChatFiles, prev, ModelId);
         NewMessage = string.Empty;
     }
 

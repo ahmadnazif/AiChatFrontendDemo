@@ -26,8 +26,9 @@ else
             </div>
             <div class="col float-end">
                 <div class="input-group">
-                    <span class="input-group-text">Text model</span>
+                    <span class="input-group-text">Model</span>
                     <select disabled="@(!IsStreamingCompleted)" class="form-select" @bind="ModelId">
+                        <option value="">Default model</option>
                         @foreach (var modelId in ModelIds)
                         {
                             <option value="@modelId">@modelId</option>
