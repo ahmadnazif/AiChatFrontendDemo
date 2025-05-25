@@ -102,7 +102,7 @@ public class StreamingChatPageBase : ComponentBase, IDisposable
         IsStreamingCompleted = false;
         Log($"[SENT] {SessionCache.Session.Username}: {NewMessage}");
 
-        await Chat.StartChatStreamingAsync(NewMessage, prev);
+        await Chat.StartChatStreamingAsync(NewMessage, prev, ModelId);
         NewMessage = string.Empty;
     }
 

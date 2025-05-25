@@ -96,12 +96,13 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     /// <param name="message"></param>
     /// <param name="previousMsg"></param>
     /// <returns></returns>
-    public async Task SendChainedAsync(string message, List<ChatMsg> previousMsg)
+    public async Task SendChainedAsync(string message, List<ChatMsg> previousMsg, string modelId = null)
     {
         ChainedChatRequest req = new()
         {
             PreviousMessages = previousMsg,
-            Prompt = new(ChatSender.User, message)
+            Prompt = new(ChatSender.User, message),
+            ModelId = modelId
         };
 
         try
@@ -116,14 +117,15 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
 
     #region Streaming chat with IAsyncEnumerable
 
-    public async Task StartChatStreamingAsync(string message, List<ChatMsg> previousMsg)
+    public async Task StartChatStreamingAsync(string message, List<ChatMsg> previousMsg, string modelId = null)
     {
         ctsStreaming = new();
 
         ChainedChatRequest req = new()
         {
             PreviousMessages = previousMsg,
-            Prompt = new(ChatSender.User, message)
+            Prompt = new(ChatSender.User, message),
+            ModelId = modelId
         };
 
         logger.LogInformation("Streaming started");
@@ -143,14 +145,15 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
 
     #region Streaming chat with ChannelReader
 
-    public async Task StartChatChannelStreamingAsync(string message, List<ChatMsg> previousMsg)
+    public async Task StartChatChannelStreamingAsync(string message, List<ChatMsg> previousMsg, string modelId = null)
     {
         ctsChannel = new();
 
         ChainedChatRequest req = new()
         {
             PreviousMessages = previousMsg,
-            Prompt = new(ChatSender.User, message)
+            Prompt = new(ChatSender.User, message),
+            ModelId = modelId
         };
 
         logger.LogInformation("Streaming started");
@@ -174,7 +177,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
 
     #region Streaming file chat with IAsyncEnumerable
 
-    public async Task StartFileChatStreamingAsync(string message, byte[] fileStream, string mediaType)
+    public async Task StartFileChatStreamingAsync(string message, byte[] fileStream, string mediaType, string modelId = null)
     {
         ctsFileStreaming = new();
 
@@ -182,7 +185,8 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
         {
             FileStream = fileStream,
             MediaType = mediaType,
-            Prompt = new(ChatSender.User, message)
+            Prompt = new(ChatSender.User, message),
+            ModelId = modelId
         };
 
         logger.LogInformation("Streaming started");
@@ -202,7 +206,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
 
     #region Streaming file chat with IAsyncEnumerable (new)
 
-    public async Task StartStreamingAsync(string message, List<ChatFile> files, List<ChatContent> previous)
+    public async Task StartStreamingAsync(string message, List<ChatFile> files, List<ChatContent> previous, string modelId = null)
     {
         ctsFileStreamingNew = new();
 
@@ -214,6 +218,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
                 Files = files,
                 Message = new(ChatSender.User, message)
             },
+            ModelId = modelId
         };
 
         logger.LogInformation("Streaming started");
