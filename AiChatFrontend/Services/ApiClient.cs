@@ -110,9 +110,52 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
 
     #endregion
 
+    #region llm
+    private const string LLM = "llm";
+    public async Task<LlmModel> GetModelAsync(LlmModelType type)
+    {
+        try
+        {
+            var httpClient = fac.CreateClient(NAME);
+            var response = await httpClient.GetAsync($"{LLM}/get-model?type={type}");
+
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadFromJsonAsync<LlmModel>();
+            else
+                return null;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.Message);
+            return null;
+        }
+    }
+
+    public async Task<List<LlmModel>> ListAllModelsAsync()
+    {
+        try
+        {
+            var httpClient = fac.CreateClient(NAME);
+            var response = await httpClient.GetAsync($"{LLM}/list-all-models");
+
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadFromJsonAsync<List<LlmModel>>();
+            else
+                return [];
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.Message);
+            return [];
+        }
+    }
+    #endregion
+
     #region embedding/text
     public const string EMBEDDING = "embedding";
     public const string EMBEDDING_TEXT = $"{EMBEDDING}/text";
+
+    [Obsolete]
     public async Task<Dictionary<LlmModelType, string>> GetModelsDictionaryAsync()
     {
         try
@@ -132,6 +175,7 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         }
     }
 
+    [Obsolete]
     public async Task<string> GetModelNameAsync(LlmModelType type)
     {
         try

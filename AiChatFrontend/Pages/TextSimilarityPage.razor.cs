@@ -8,10 +8,11 @@ public class TextSimilarityPageBase : ComponentBase
 {
     [Inject] public ApiClient Api { get; set; }
     [Inject] public IToaster Toastr { get; set; }
-    protected Dictionary<LlmModelType, string> Models { get; set; } = [];
-    protected string EmbeddingModelName { get; set; } = "Getting..";
-    protected string TextModelName { get; set; } = "Getting..";
-    protected string MultimodalModelName { get; set; } = "Getting..";
+    protected List<LlmModel> Models { get; set; } = [];
+    protected IEnumerable<string> TextModelIds { get; set; } = [];
+    protected string EmbeddingModelId { get; set; } = "Getting..";
+    protected string TextModelId { get; set; } = "Getting..";
+    protected string MultimodalModelId { get; set; } = "Getting..";
     protected List<TextVector> TextVectors { get; set; } = [];
     protected List<TextSimilarityResult> TextSimilarityResults { get; set; } = [];
     protected bool IsStoring { get; set; } = false;
@@ -39,10 +40,11 @@ public class TextSimilarityPageBase : ComponentBase
 
     private async Task RefreshModelsAsync()
     {
-        Models = await Api.GetModelsDictionaryAsync();
-        EmbeddingModelName = Models[LlmModelType.Embedding];
-        TextModelName = Models[LlmModelType.Text];
-        MultimodalModelName = Models[LlmModelType.Multimodal];
+        Models = await Api.ListAllModelsAsync();
+        EmbeddingModelId = LlmModelHelper.GetDefaulModelId(Models, LlmModelType.Embedding);
+        TextModelId = LlmModelHelper.GetDefaulModelId(Models, LlmModelType.Text);
+        TextModelIds = LlmModelHelper.GetModelIds(Models, LlmModelType.Text);
+        MultimodalModelId = LlmModelHelper.GetDefaulModelId(Models, LlmModelType.Multimodal);       
     }
 
     private async Task RefreshTextVectorAsync()

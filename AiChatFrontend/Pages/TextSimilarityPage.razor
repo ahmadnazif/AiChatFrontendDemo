@@ -5,7 +5,7 @@
     Text vector is stored to in-memory vector database via <a href="https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/out-of-the-box-connectors/inmemory-connector?pivots=programming-language-csharp" target="_blank">Semantic Kernel In-Memory connector (preview version)</a>.
     When backend API is restarted, stored vector data is gone.
     <ul>
-        <li>Embeddng model: <code>@EmbeddingModelName</code></li>
+        <li>Embeddng model: <code>@EmbeddingModelId</code></li>
         <li>Embedding generator: Ollama Embedding Generator via <code> Microsoft.Extensions.AI</code> library (also preview version)</li>
         <li>Distance function: Cosine Similarity</li>
         <li>Index kind: HNSW</li>
@@ -13,8 +13,8 @@
 </div>
 <h3><strong>Simple RAG:</strong> Text Similarity Analysis</h3>
 <h6>
-    A text will be transformed into embedding vector using <code>@EmbeddingModelName</code>, then stored in vector database for further analysis.
-    The result is solely obtained from vector database and not further processed to <code>@MultimodalModelName</code>
+    A text will be transformed into embedding vector using <code>@EmbeddingModelId</code>, then stored in vector database for further analysis.
+    The result is solely obtained from vector database and not further processed to <code>@MultimodalModelId</code>
 </h6>
 
 <br />
@@ -44,9 +44,9 @@
                             <label class="text-muted">Model ID</label>
                             <select class="form-select" @bind="AutoPopulateRequest.ModelId">
                                 <option value="">Default model</option>
-                                @foreach (var model in Models)
+                                @foreach (var model in TextModelIds)
                                 {
-                                    <option value="@model.Value">@model.Key (@model.Value)</option>
+                                    <option value="@model">@model</option>
                                 }
                             </select>
                         </div>
