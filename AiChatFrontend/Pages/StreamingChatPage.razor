@@ -20,8 +20,21 @@ else
     }
     else
     {
-        <div>
-            <label><strong>Username</strong>: @SessionCache.Session.Username | <strong>Connection ID:</strong> @SessionCache.Session.ConnectionId | <strong>Started:</strong> @SessionCache.Session.StartTime </label>
+        <div class="row">
+            <div class="col">
+                <label><strong>Username</strong>: @SessionCache.Session.Username | <strong>Connection ID:</strong> @SessionCache.Session.ConnectionId | <strong>Started:</strong> @SessionCache.Session.StartTime </label>
+            </div>
+            <div class="col float-end">
+                <div class="input-group">
+                    <span class="input-group-text">Text model</span>
+                    <select disabled="@(!IsStreamingCompleted)" class="form-select" @bind="ModelId">
+                        @foreach (var modelId in ModelIds)
+                        {
+                            <option value="@modelId">@modelId</option>
+                        }
+                    </select>
+                </div>
+            </div>
         </div>
 
         <div class="content px-4">

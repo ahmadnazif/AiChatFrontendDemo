@@ -16,6 +16,8 @@ public class StreamingChatPageBase : ComponentBase, IDisposable
     [Inject] public SessionCache SessionCache { get; set; }
     [Inject] public ChatCache ChatCache { get; set; }
     protected bool IsApiConnected { get; set; }
+    protected List<string> ModelIds { get; set; } = [];
+    protected string ModelId { get; set; }
     protected bool IsStreamingCompleted { get; set; } = true;
     protected string StreamingId { get; set; }
     protected Stopwatch StreamingSw { get; set; } = new Stopwatch();
@@ -27,6 +29,7 @@ public class StreamingChatPageBase : ComponentBase, IDisposable
         IsApiConnected = await Api.IsConnectedAsync();
         try
         {
+            await RefreshModelsAsync();
             Chat.OnStreamingChatReceived += OnStreamingChatReceived;
         }
         catch (Exception ex)
@@ -35,6 +38,14 @@ public class StreamingChatPageBase : ComponentBase, IDisposable
             LogError(ex.Message);
             Toastr.Error(ex.Message);
         }
+    }
+
+    private async Task RefreshModelsAsync()
+    {
+        var text = await Api.GetModelAsync(LlmModelType.Text);
+        var multi = await Api.GetModelAsync(LlmModelType.Multimodal);
+
+        ModelIds = [.. text.ModelIds, .. multi.ModelIds];
     }
 
     private void OnStreamingChatReceived(object sender, StreamingChatReceivedEventArgs e)
