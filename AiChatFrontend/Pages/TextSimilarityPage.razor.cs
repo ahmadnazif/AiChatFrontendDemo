@@ -19,7 +19,7 @@ public class TextSimilarityPageBase : ComponentBase
     protected string TextToStore { get; set; } = null;
     protected bool IsComparing { get; set; } = false;
     protected bool IsAutoPopulating { get; set; } = false;
-    protected string TextToCompare { get; set; } = null;
+    protected TextSimilarityPrompt Prompt { get; set; } = new() { Top = 5 };
     protected string ButtonLabelStore => IsStoring ? "Upserting.." : "Upsert";
     protected string ButtonLabelCompare => IsComparing ? "Processing.." : "Process";
     protected string ButtonLabelAutoPopulate => IsAutoPopulating ? "Generating.." : "Generate & Upsert";
@@ -44,7 +44,7 @@ public class TextSimilarityPageBase : ComponentBase
         EmbeddingModelId = LlmModelHelper.GetDefaulModelId(Models, LlmModelType.Embedding);
         TextModelId = LlmModelHelper.GetDefaulModelId(Models, LlmModelType.Text);
         TextModelIds = LlmModelHelper.GetModelIds(Models, LlmModelType.Text);
-        MultimodalModelId = LlmModelHelper.GetDefaulModelId(Models, LlmModelType.Multimodal);       
+        MultimodalModelId = LlmModelHelper.GetDefaulModelId(Models, LlmModelType.Multimodal);
     }
 
     private async Task RefreshTextVectorAsync()
@@ -104,7 +104,7 @@ public class TextSimilarityPageBase : ComponentBase
 
     protected async Task CompareTextAsync()
     {
-        if (string.IsNullOrWhiteSpace(TextToCompare))
+        if (string.IsNullOrWhiteSpace(Prompt.Text))
         {
             Toastr.Warning("Text to compare is required");
             return;
@@ -113,7 +113,7 @@ public class TextSimilarityPageBase : ComponentBase
         IsComparing = true;
 
         TextSimilarityResults.Clear();
-        var result = Api.StreamTextVectorSimilarityAsync(TextToCompare);
+        var result = Api.StreamTextVectorSimilarityAsync(Prompt);
         await foreach (var r in result)
         {
             TextSimilarityResults.Add(r);

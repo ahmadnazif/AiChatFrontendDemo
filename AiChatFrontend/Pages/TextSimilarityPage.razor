@@ -154,7 +154,13 @@
 <div class="row">
     <div class="col-sm-4">
         <div class="input-group">
-            <input class="form-control" placeholder="Enter a comparison text" @bind="TextToCompare" />
+            <input class="form-control" placeholder="Enter a comparison text" @bind="Prompt.Text" />
+            <select class="form-select" @bind="Prompt.Top">
+                <option value="1">1</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+            </select>
             <button class="btn btn-success" @onclick="async() => await CompareTextAsync()" disabled="@IsComparing">@ButtonLabelCompare</button>
         </div>
         <small class="text-muted">Enter a comparison text</small>
@@ -167,7 +173,7 @@
 <div class="row">
     <div class="col-sm-4">
         <div class="input-group">
-            <input class="form-control" @bind="TextToCompare" readonly />
+            <input class="form-control" @bind="Prompt" readonly />
         </div>
         <small class="text-muted">The text to compare against vector database</small>
     </div>
