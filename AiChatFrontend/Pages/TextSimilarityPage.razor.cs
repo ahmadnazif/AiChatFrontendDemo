@@ -106,7 +106,7 @@ public class TextSimilarityPageBase : ComponentBase
     #region Step 2
     protected async Task QueryFromVectorDbAsync()
     {
-        if (string.IsNullOrWhiteSpace(Prompt.Text))
+        if (string.IsNullOrWhiteSpace(Prompt.Prompt))
         {
             Toastr.Warning("Text to compare is required");
             return;

@@ -2,6 +2,6 @@
 
 public class TextSimilarityVectorDbRequest
 {
-    public string? Text { get; set; }
+    public string? Prompt { get; set; }
     public int Top { get; set; }
 }

@@ -138,7 +138,7 @@
             <div class="row mb-2">
                 <div class="col">
                     <label>Enter a query text against above data</label>
-                    <input class="form-control" placeholder="Query text" @bind="Prompt.Text" />
+                    <input class="form-control" placeholder="Query text" @bind="Prompt.Prompt" />
                 </div>
             </div>
             <div class="row mb-2">
@@ -149,7 +149,7 @@
                         <option value="5">5</option>
                         <option value="10">10</option>
                         <option value="20">20</option>
-                    </select>
+                    </select>                    
                 </div>
                 <div class="col">
                     <label>&nbsp;</label><br />
@@ -199,17 +199,18 @@
             <div class="row mb-2">
                 <div class="col">
                     <label>Enter a query text against above data</label>
-                    <input class="form-control" placeholder="Query text" @bind="Prompt.Text" />
+                    <input class="form-control" placeholder="Query text" @bind="Prompt.Prompt" />
                 </div>
             </div>
             <div class="row mb-2">
                 <div class="col">
-                    <label class="text-muted">TOP</label>
-                    <select class="form-select" @bind="Prompt.Top">
-                        <option value="1">1</option>
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="20">20</option>
+                    <label class="text-muted">Model ID</label>
+                    <select class="form-select" @bind="AutoPopulateRequest.ModelId">
+                        <option value="">Default model</option>
+                        @foreach (var model in TextModelIds)
+                        {
+                            <option value="@model">@model</option>
+                        }
                     </select>
                 </div>
                 <div class="col">
@@ -220,34 +221,7 @@
         </div>
     </div>
     <div class="col">
-        <table class="table table-bordered table-sm">
-            <thead class="table-dark">
-                <tr>
-                    <th>Text</th>
-                    <th>ID</th>
-                    <th>Score</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (TextSimilarityResults.Count == 0)
-                {
-                    <span>
-                        <label><i>No result yet</i></label>
-                    </span>
-                }
-                else
-                {
-                    foreach (var data in TextSimilarityResults)
-                    {
-                        <tr>
-                            <td><strong>@data.Text</strong></td>
-                            <td>@data.Guid</td>
-                            <td>@data.Score</td>
-                        </tr>
-                    }
-                }
-            </tbody>
-        </table>
+        <textarea  class="form-control" readonly rows="10" style="resize:none"></textarea>
     </div>
 </div>
 
