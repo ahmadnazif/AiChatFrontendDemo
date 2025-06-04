@@ -90,25 +90,6 @@
                             <button class="btn btn-success" @onclick="async() => await AutoPopulateStatementAsync()" disabled="@IsAutoPopulating">@ButtonLabelAutoPopulate</button>
                         </div>
                     </div>
-                    @*<div class="row">
-                        <div class="col">
-                            <div class="input-group">
-                                <span class="input-group-text">@MultimodalModelName</span>
-                                <select class="form-select" @bind="AutoPopulateRequest.Number">
-                                    <option value="5">Generate 5</option>
-                                    <option value="15">Generate 15</option>
-                                    <option value="30">Generate 30</option>
-                                </select>
-                                <select class="form-select" @bind="AutoPopulateRequest.Length">
-                                    <option value="@TextGenerationLength.Shortest">Very short statements</option>
-                                    <option value="@TextGenerationLength.Short">Short statements</option>
-                                    <option value="@TextGenerationLength.Long">Long statement</option>
-                                </select>
-                                <button class="btn btn-success" @onclick="async() => await AutoPopulateStatementAsync()" disabled="@IsAutoPopulating">@ButtonLabelAutoPopulate</button>
-                            </div>
-                        </div>
-                    </div>*@
-
                 </div>
             </div>
         </div>
@@ -149,64 +130,129 @@
 </div>
 
 <hr />
-<h5><strong>Step 2:</strong> Enter a simple statement text</h5>
+<h5><strong>Step 2:</strong> Query from vector database</h5>
 <label class="mb-3">This text will be sent for analysis to check the similarity of it against data stored in vector database</label>
 <div class="row">
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input class="form-control" placeholder="Enter a comparison text" @bind="Prompt.Text" />
-            <select class="form-select" @bind="Prompt.Top">
-                <option value="1">1</option>
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="20">20</option>
-            </select>
-            <button class="btn btn-success" @onclick="async() => await CompareTextAsync()" disabled="@IsComparing">@ButtonLabelCompare</button>
+    <div class="col-sm-5">
+        <div class="card card-body">
+            <div class="row mb-2">
+                <div class="col">
+                    <label>Enter a query text against above data</label>
+                    <input class="form-control" placeholder="Query text" @bind="Prompt.Text" />
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col">
+                    <label class="text-muted">TOP</label>
+                    <select class="form-select" @bind="Prompt.Top">
+                        <option value="1">1</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label>&nbsp;</label><br />
+                    <button class="btn btn-success" @onclick="async() => await QueryFromVectorDbAsync()" disabled="@IsComparing">@ButtonLabelCompare</button>
+                </div>
+            </div>
         </div>
-        <small class="text-muted">Enter a comparison text</small>
+    </div>
+    <div class="col">
+        <table class="table table-bordered table-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>Text</th>
+                    <th>ID</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (TextSimilarityResults.Count == 0)
+                {
+                    <span>
+                        <label><i>No result yet</i></label>
+                    </span>
+                }
+                else
+                {
+                    foreach (var data in TextSimilarityResults)
+                    {
+                        <tr>
+                            <td><strong>@data.Text</strong></td>
+                            <td>@data.Guid</td>
+                            <td>@data.Score</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
     </div>
 </div>
 
 <hr />
-<h5><strong>Step 3:</strong> Similarity result</h5>
-<label class="mb-3">Result will be sorted by the most similar meaning against the query text</label>
+<h5><strong>Final:</strong> Response from LLM</h5>
+<label class="mb-3">Original query will be enhanced with result obtained from vector database, then passed to LLM</label>
 <div class="row">
-    <div class="col-sm-4">
-        <div class="input-group">
-            <input class="form-control" @bind="Prompt" readonly />
+    <div class="col-sm-5">
+        <div class="card card-body">
+            <div class="row mb-2">
+                <div class="col">
+                    <label>Enter a query text against above data</label>
+                    <input class="form-control" placeholder="Query text" @bind="Prompt.Text" />
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col">
+                    <label class="text-muted">TOP</label>
+                    <select class="form-select" @bind="Prompt.Top">
+                        <option value="1">1</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label>&nbsp;</label><br />
+                    <button class="btn btn-success" @onclick="async() => await QueryFromVectorDbAsync()" disabled="@IsComparing">@ButtonLabelCompare</button>
+                </div>
+            </div>
         </div>
-        <small class="text-muted">The text to compare against vector database</small>
     </div>
     <div class="col">
-        <div class="col">
-            <table class="table table-bordered table-sm">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Text</th>
-                        <th>ID</th>
-                        <th>Score</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (TextSimilarityResults.Count == 0)
+        <table class="table table-bordered table-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>Text</th>
+                    <th>ID</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (TextSimilarityResults.Count == 0)
+                {
+                    <span>
+                        <label><i>No result yet</i></label>
+                    </span>
+                }
+                else
+                {
+                    foreach (var data in TextSimilarityResults)
                     {
-                        <span>
-                            <label><i>No result yet</i></label>
-                        </span>
+                        <tr>
+                            <td><strong>@data.Text</strong></td>
+                            <td>@data.Guid</td>
+                            <td>@data.Score</td>
+                        </tr>
                     }
-                    else
-                    {
-                        foreach (var data in TextSimilarityResults)
-                        {
-                            <tr>
-                                <td><strong>@data.Text</strong></td>
-                                <td>@data.Guid</td>
-                                <td>@data.Score</td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
-        </div>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
+
+
+
+<br />
+<br />
+<br />

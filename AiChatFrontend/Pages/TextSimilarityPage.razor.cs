@@ -52,6 +52,7 @@ public class TextSimilarityPageBase : ComponentBase
         TextVectors = await Api.ListAllTextVectorFromCacheAsync();
     }
 
+    #region Step 1
     protected async Task StoreTextAsync()
     {
         if (string.IsNullOrWhiteSpace(TextToStore))
@@ -100,9 +101,10 @@ public class TextSimilarityPageBase : ComponentBase
 
         IsAutoPopulating = false;
     }
+    #endregion
 
-
-    protected async Task CompareTextAsync()
+    #region Step 2
+    protected async Task QueryFromVectorDbAsync()
     {
         if (string.IsNullOrWhiteSpace(Prompt.Text))
         {
@@ -122,5 +124,6 @@ public class TextSimilarityPageBase : ComponentBase
 
         IsComparing = false;
     }
+    #endregion
 
 }
