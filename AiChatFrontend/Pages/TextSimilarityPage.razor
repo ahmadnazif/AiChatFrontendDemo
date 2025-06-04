@@ -6,12 +6,12 @@
     When backend API is restarted, stored vector data is gone.
     <ul>
         <li>Embeddng model: <code>@EmbeddingModelId</code></li>
-        <li>Embedding generator: Ollama Embedding Generator via <code> Microsoft.Extensions.AI</code> library (also preview version)</li>
+        <li>Embedding generator: Ollama Embedding Generator via <code> Microsoft.Extensions.AI</code> library</li>
         <li>Distance function: Cosine Similarity</li>
         <li>Index kind: HNSW</li>
     </ul>
 </div>
-<h3><strong>Simple RAG:</strong> Text Similarity Analysis</h3>
+<h3><strong>In-Memory RAG:</strong> Text Similarity Analysis</h3>
 <h6>
     A text will be transformed into embedding vector using <code>@EmbeddingModelId</code>, then stored in vector database for further analysis.
     The result is solely obtained from vector database and not further processed to <code>@MultimodalModelId</code>
