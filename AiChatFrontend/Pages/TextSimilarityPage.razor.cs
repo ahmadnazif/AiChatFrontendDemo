@@ -19,7 +19,7 @@ public class TextSimilarityPageBase : ComponentBase
     protected string TextToStore { get; set; } = null;
     protected bool IsComparing { get; set; } = false;
     protected bool IsAutoPopulating { get; set; } = false;
-    protected TextSimilarityPrompt Prompt { get; set; } = new() { Top = 5 };
+    protected TextSimilarityVectorDbRequest Prompt { get; set; } = new() { Top = 5 };
     protected string ButtonLabelStore => IsStoring ? "Upserting.." : "Upsert";
     protected string ButtonLabelCompare => IsComparing ? "Processing.." : "Process";
     protected string ButtonLabelAutoPopulate => IsAutoPopulating ? "Generating.." : "Generate & Upsert";

@@ -271,7 +271,7 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         }
     }
 
-    public async IAsyncEnumerable<TextSimilarityResult> StreamTextVectorSimilarityAsync(TextSimilarityPrompt prompt)
+    public async IAsyncEnumerable<TextSimilarityResult> StreamTextVectorSimilarityAsync(TextSimilarityVectorDbRequest prompt)
     {
         var httpClient = fac.CreateClient(NAME);
         var results = httpClient.GetFromJsonAsAsyncEnumerable<TextSimilarityResult>($"{EMBEDDING_TEXT}/query-similarity?text={prompt.Text}&top={prompt.Top}");
