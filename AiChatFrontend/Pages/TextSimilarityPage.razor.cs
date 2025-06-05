@@ -4,11 +4,14 @@ using Sotsera.Blazor.Toaster;
 
 namespace AiChatFrontend.Pages;
 
-public class TextSimilarityPageBase : ComponentBase
+public class TextSimilarityPageBase : ComponentBase, IDisposable
 {
     [Inject] public ILogger<TextSimilarityPage> Logger { get; set; }
     [Inject] public ApiClient Api { get; set; }
     [Inject] public IToaster Toastr { get; set; }
+    [Inject] public ChatService Chat { get; set; }
+    [Inject] public SessionService Session { get; set; }
+    protected bool IsApiConnected { get; set; }
     protected List<LlmModel> Models { get; set; } = [];
     protected IEnumerable<string> TextModelIds { get; set; } = [];
     protected string EmbeddingModelId { get; set; } = "Getting..";
@@ -39,8 +42,39 @@ public class TextSimilarityPageBase : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        await RefreshModelsAsync();
-        await RefreshTextVectorAsync();
+        IsApiConnected = await Api.IsConnectedAsync();
+
+        try
+        {
+            var tempUsername = Guid.NewGuid().ToString().Split("-")[0];
+            await Session.ConnectAsync(tempUsername);
+            Chat.OnTextSimilarityChatReceived += OnChatReceived;
+
+            await RefreshModelsAsync();
+            await RefreshTextVectorAsync();
+        }
+        catch (Exception ex)
+        {
+            Chat.OnTextSimilarityChatReceived -= OnChatReceived;
+            LogError(ex.Message);
+        }
+    }
+
+    private void OnChatReceived(object sender, StreamingChatReceivedEventArgs e)
+    {
+        LlmResp += e.Response.Message.Text;
+        StateHasChanged();
+    }
+
+    private void Log(string text) => Logger.LogInformation($"{DateTime.Now.ToLongTimeString()} || {text}");
+
+    private void LogError(string text, bool isCritical = false)
+    {
+        var log = $"{DateTime.Now.ToLongTimeString()} || {text}";
+        if (isCritical)
+            Logger.LogCritical(log);
+        else
+            Logger.LogError(log);
     }
 
     private async Task RefreshModelsAsync()
@@ -143,17 +177,18 @@ public class TextSimilarityPageBase : ComponentBase
 
         LlmReq.OriginalPrompt = DbReq.Prompt;
         LlmReq.Results = [.. DbResp.Select(x => x.Text)];
-        LlmResp = null;
 
-        var result = Api.StreamTextSimilarityToLlmAsync(LlmReq);
-        await foreach(var item in result)
-        {
-            Logger.LogInformation(item);
-            LlmResp += item;
-            StateHasChanged();
-        }
-        
+        LlmResp = string.Empty;
+
+        await Chat.StartStreamTextSimilarityLlmAsync(LlmReq);
     }
     #endregion
+
+    public void Dispose()
+    {
+        Chat.OnTextSimilarityChatReceived -= OnChatReceived;
+        GC.SuppressFinalize(this);
+        Log("Disposed");
+    }
 
 }

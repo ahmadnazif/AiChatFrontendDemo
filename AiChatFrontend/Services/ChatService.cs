@@ -11,6 +11,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     private CancellationTokenSource ctsChannel;
     private CancellationTokenSource ctsFileStreaming;
     private CancellationTokenSource ctsFileStreamingNew;
+    private CancellationTokenSource ctsTextSimilarityLlm;
     /// <summary>
     /// Occured when single message received
     /// </summary>
@@ -33,6 +34,8 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
 
     public event StreamingChatReceivedEventHandler OnFileStreamingChatReceived;
     public event StreamingChatReceivedEventHandler OnChatReceived;
+
+    public event StreamingChatReceivedEventHandler OnTextSimilarityChatReceived;
 
     /// <summary>
     /// Start the connection with username
@@ -231,6 +234,27 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
     public void StopStreaming()
     {
         ctsFileStreamingNew.Cancel();
+        logger.LogInformation("Streaming stopped");
+    }
+
+    #endregion
+
+    #region Streaming for text similarity response
+
+    public async Task StartStreamTextSimilarityLlmAsync(TextSimilarityLlmRequest request)
+    {
+        ctsTextSimilarityLlm = new();
+
+        logger.LogInformation("Streaming started");
+        await foreach (var resp in hubConnection.StreamAsync<StreamingChatResponse>("StreamTextSimilarityLlmAsync", request, ctsTextSimilarityLlm.Token))
+        {
+            OnTextSimilarityChatReceived?.Invoke(this, new StreamingChatReceivedEventArgs(resp));
+        }
+    }
+
+    public void StopStreamTextSimilarityLlm()
+    {
+        ctsTextSimilarityLlm.Cancel();
         logger.LogInformation("Streaming stopped");
     }
 
