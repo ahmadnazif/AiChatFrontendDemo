@@ -138,13 +138,13 @@
             <div class="row mb-2">
                 <div class="col">
                     <label>Enter a query text against above data</label>
-                    <input class="form-control" placeholder="Query text" @bind="Prompt.Prompt" />
+                    <input class="form-control" placeholder="Query text" @bind="DbReq.Prompt" />
                 </div>
             </div>
             <div class="row mb-2">
                 <div class="col">
                     <label class="text-muted">TOP</label>
-                    <select class="form-select" @bind="Prompt.Top">
+                    <select class="form-select" @bind="DbReq.Top">
                         <option value="1">1</option>
                         <option value="5">5</option>
                         <option value="10">10</option>
@@ -168,7 +168,7 @@
                 </tr>
             </thead>
             <tbody>
-                @if (TextSimilarityResults.Count == 0)
+                @if (DbResp.Count == 0)
                 {
                     <span>
                         <label><i>No result yet</i></label>
@@ -176,7 +176,7 @@
                 }
                 else
                 {
-                    foreach (var data in TextSimilarityResults)
+                    foreach (var data in DbResp)
                     {
                         <tr>
                             <td><strong>@data.Text</strong></td>
@@ -198,14 +198,8 @@
         <div class="card card-body">
             <div class="row mb-2">
                 <div class="col">
-                    <label>Enter a query text against above data</label>
-                    <input class="form-control" placeholder="Query text" @bind="Prompt.Prompt" />
-                </div>
-            </div>
-            <div class="row mb-2">
-                <div class="col">
                     <label class="text-muted">Model ID</label>
-                    <select class="form-select" @bind="AutoPopulateRequest.ModelId">
+                    <select class="form-select" @bind="LlmReq.ModelId">
                         <option value="">Default model</option>
                         @foreach (var model in TextModelIds)
                         {
@@ -215,13 +209,14 @@
                 </div>
                 <div class="col">
                     <label>&nbsp;</label><br />
-                    <button class="btn btn-success" @onclick="async() => await QueryFromVectorDbAsync()" disabled="@IsComparing">@ButtonLabelCompare</button>
+                    <button class="btn btn-success" @onclick="async() => await QueryToLlmAsync()" disabled="@IsLlmQuerying">@ButtonLlmQuery</button>
                 </div>
             </div>
         </div>
     </div>
     <div class="col">
-        <textarea  class="form-control" readonly rows="10" style="resize:none"></textarea>
+        @*<textarea  class="form-control" readonly rows="10" style="resize:none">@LlmResp</textarea>*@
+        <label>@LlmResp</label>
     </div>
 </div>
 

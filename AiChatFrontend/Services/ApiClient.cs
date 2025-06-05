@@ -271,10 +271,43 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         }
     }
 
-    public async IAsyncEnumerable<TextSimilarityResult> StreamTextVectorSimilarityAsync(TextSimilarityVectorDbRequest prompt)
+    public async IAsyncEnumerable<TextSimilarityResult> StreamTextSimilarityFromDbAsync(TextSimilarityVectorDbRequest prompt)
     {
         var httpClient = fac.CreateClient(NAME);
-        var results = httpClient.GetFromJsonAsAsyncEnumerable<TextSimilarityResult>($"{EMBEDDING_TEXT}/query-similarity?text={prompt.Prompt}&top={prompt.Top}");
+        var results = httpClient.GetFromJsonAsAsyncEnumerable<TextSimilarityResult>($"{EMBEDDING_TEXT}/query-from-db?text={prompt.Prompt}&top={prompt.Top}");
+
+        await foreach (var r in results)
+        {
+            yield return r;
+        }
+    }
+
+    public async IAsyncEnumerable<string> StreamTextSimilarityToLlmAsync(TextSimilarityLlmRequest req)
+    {
+        var httpClient = fac.CreateClient(NAME);
+        var results = httpClient.PostAsAsyncEnumerable<string>($"{EMBEDDING_TEXT}/query-to-llm", req, default);
+
+        await foreach(var r in results)
+        {
+            yield return r;
+        }
+    }
+
+    public async IAsyncEnumerable<string> StreamPostAsync()
+    {
+        var httpClient = fac.CreateClient(NAME);
+        var results = httpClient.PostAsAsyncEnumerable<string>($"{EMBEDDING_TEXT}/stream-post", null, default);
+
+        await foreach (var r in results)
+        {
+            yield return r;
+        }
+    }
+
+    public async IAsyncEnumerable<string> StreamGetAsync()
+    {
+        var httpClient = fac.CreateClient(NAME);
+        var results = httpClient.GetFromJsonAsAsyncEnumerable<string>($"{EMBEDDING_TEXT}/stream-get", default);
 
         await foreach (var r in results)
         {

@@ -7,10 +7,8 @@ public static class HttpClientExtension
 {
     public static async IAsyncEnumerable<T> PostAsAsyncEnumerable<T>(this HttpClient httpClient, string url, object body, [EnumeratorCancellation] CancellationToken ct)
     {
-        HttpRequestMessage req = new()
+        HttpRequestMessage req = new(HttpMethod.Post, url)
         {
-            Method = HttpMethod.Post,
-            RequestUri = new Uri(url),
             Content = JsonContent.Create(body)
         };
 

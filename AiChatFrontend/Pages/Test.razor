@@ -1,0 +1,18 @@
+﻿@page "/test"
+@inherits TestBase
+<h3>Test</h3>
+
+
+<div class="row">
+    <div class="col">
+        <button class="btn btn-success" @onclick="async() => await StreamGetAsync()">Stream Get</button>
+        <hr />
+        @StreamGet
+    </div>
+    <div class="col">
+        <button class="btn btn-success" @onclick="async() => await StreamPostAsync()">Stream Post</button>
+        <hr />
+        @StreamPost
+    </div>
+</div>
+

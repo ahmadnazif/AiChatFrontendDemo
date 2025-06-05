@@ -6,6 +6,7 @@ namespace AiChatFrontend.Pages;
 
 public class TextSimilarityPageBase : ComponentBase
 {
+    [Inject] public ILogger<TextSimilarityPage> Logger { get; set; }
     [Inject] public ApiClient Api { get; set; }
     [Inject] public IToaster Toastr { get; set; }
     protected List<LlmModel> Models { get; set; } = [];
@@ -14,14 +15,18 @@ public class TextSimilarityPageBase : ComponentBase
     protected string TextModelId { get; set; } = "Getting..";
     protected string MultimodalModelId { get; set; } = "Getting..";
     protected List<TextVector> TextVectors { get; set; } = [];
-    protected List<TextSimilarityResult> TextSimilarityResults { get; set; } = [];
     protected bool IsStoring { get; set; } = false;
     protected string TextToStore { get; set; } = null;
     protected bool IsComparing { get; set; } = false;
     protected bool IsAutoPopulating { get; set; } = false;
-    protected TextSimilarityVectorDbRequest Prompt { get; set; } = new() { Top = 5 };
+    protected bool IsLlmQuerying { get; set; } = false;
+    protected TextSimilarityVectorDbRequest DbReq { get; set; } = new() { Top = 5 };
+    protected List<TextSimilarityResult> DbResp { get; set; } = [];
+    protected TextSimilarityLlmRequest LlmReq { get; set; } = new();
+    protected string LlmResp { get; set; }
     protected string ButtonLabelStore => IsStoring ? "Upserting.." : "Upsert";
     protected string ButtonLabelCompare => IsComparing ? "Processing.." : "Process";
+    protected string ButtonLlmQuery => IsLlmQuerying ? "Querying.." : "Query";
     protected string ButtonLabelAutoPopulate => IsAutoPopulating ? "Generating.." : "Generate & Upsert";
     protected AutoPopulateStatementRequest AutoPopulateRequest { get; set; } = new()
     {
@@ -106,23 +111,48 @@ public class TextSimilarityPageBase : ComponentBase
     #region Step 2
     protected async Task QueryFromVectorDbAsync()
     {
-        if (string.IsNullOrWhiteSpace(Prompt.Prompt))
+        if (string.IsNullOrWhiteSpace(DbReq.Prompt))
         {
-            Toastr.Warning("Text to compare is required");
+            Toastr.Warning("Query text is required");
             return;
         }
 
         IsComparing = true;
 
-        TextSimilarityResults.Clear();
-        var result = Api.StreamTextVectorSimilarityAsync(Prompt);
-        await foreach (var r in result)
+        DbResp.Clear();
+        var results = Api.StreamTextSimilarityFromDbAsync(DbReq);
+        await foreach (var item in results)
         {
-            TextSimilarityResults.Add(r);
+            Logger.LogInformation(item.Text);
+            DbResp.Add(item);
             StateHasChanged();
         }
 
         IsComparing = false;
+    }
+    #endregion
+
+    #region Final
+    protected async Task QueryToLlmAsync()
+    {
+        if (string.IsNullOrWhiteSpace(DbReq.Prompt))
+        {
+            Toastr.Warning("Query text is required");
+            return;
+        }
+
+        LlmReq.OriginalPrompt = DbReq.Prompt;
+        LlmReq.Results = [.. DbResp.Select(x => x.Text)];
+        LlmResp = null;
+
+        var result = Api.StreamTextSimilarityToLlmAsync(LlmReq);
+        await foreach(var item in result)
+        {
+            Logger.LogInformation(item);
+            LlmResp += item;
+            StateHasChanged();
+        }
+        
     }
     #endregion
 
