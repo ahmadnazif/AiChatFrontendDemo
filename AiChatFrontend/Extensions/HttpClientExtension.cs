@@ -15,7 +15,7 @@ public static class HttpClientExtension
 
         request.SetBrowserResponseStreamingEnabled(true);
 
-        var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
+        using var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
 
         response.EnsureSuccessStatusCode();
         var stream = await response.Content.ReadAsStreamAsync(ct);

@@ -1,6 +1,6 @@
 ﻿namespace AiChatFrontend.Models;
 
-public class TextSimilarityLlmRequest
+public class TextAnalysisLlmRequest
 {
     public string? OriginalPrompt { get; set; }
     public List<string> Results { get; set; }

@@ -241,7 +241,7 @@ public class ChatService(IConfiguration config, ILogger<ChatService> logger) : I
 
     #region Streaming for text similarity response
 
-    public async Task StartStreamTextSimilarityLlmAsync(TextSimilarityLlmRequest request)
+    public async Task StartStreamTextSimilarityLlmAsync(TextAnalysisLlmRequest request)
     {
         ctsTextSimilarityLlm = new();
 

@@ -1,6 +1,6 @@
 ﻿namespace AiChatFrontend.Models;
 
-public class TextSimilarityVectorDbRequest
+public class TextAnalysisVdbRequest
 {
     public string? Prompt { get; set; }
     public int Top { get; set; }

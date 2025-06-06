@@ -1,5 +1,5 @@
-﻿@page "/text-similarity"
-@inherits TextSimilarityPageBase
+﻿@page "/text-analysis"
+@inherits TextAnalysisPageBase
 
 <div class="alert alert-info">
     Text vector is stored to in-memory vector database via <a href="https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/out-of-the-box-connectors/inmemory-connector?pivots=programming-language-csharp" target="_blank">Semantic Kernel In-Memory connector (preview version)</a>.
@@ -11,7 +11,7 @@
         <li>Index kind: HNSW</li>
     </ul>
 </div>
-<h3><strong>In-Memory RAG:</strong> Text Similarity Analysis</h3>
+<h3><strong>RAG:</strong> Text Analysis <span class="badge badge-info">In-Memory Vector DB</span></h3>
 <h6>
     A text will be transformed into embedding vector using <code>@EmbeddingModelId</code>, then stored in vector database for further analysis.
     The result is solely obtained from vector database and not further processed to <code>@MultimodalModelId</code>

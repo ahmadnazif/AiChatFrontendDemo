@@ -4,7 +4,7 @@ using Sotsera.Blazor.Toaster;
 
 namespace AiChatFrontend.Pages;
 
-public class TextSimilarityPageBase : ComponentBase, IDisposable
+public class TextAnalysisPageBase : ComponentBase, IDisposable
 {
     [Inject] public ILogger<TextSimilarityPage> Logger { get; set; }
     [Inject] public ApiClient Api { get; set; }
@@ -23,9 +23,9 @@ public class TextSimilarityPageBase : ComponentBase, IDisposable
     protected bool IsComparing { get; set; } = false;
     protected bool IsAutoPopulating { get; set; } = false;
     protected bool IsLlmQuerying { get; set; } = false;
-    protected TextSimilarityVectorDbRequest DbReq { get; set; } = new() { Top = 5 };
-    protected List<TextSimilarityResult> DbResp { get; set; } = [];
-    protected TextSimilarityLlmRequest LlmReq { get; set; } = new();
+    protected TextAnalysisVdbRequest DbReq { get; set; } = new() { Top = 5 };
+    protected List<TextAnalysisSimilarityResult> DbResp { get; set; } = [];
+    protected TextAnalysisLlmRequest LlmReq { get; set; } = new();
     protected string LlmResp { get; set; } = "Please initiate the query";
     protected string ButtonLabelStore => IsStoring ? "Upserting.." : "Upsert";
     protected string ButtonLabelCompare => IsComparing ? "Processing.." : "Process";
@@ -154,7 +154,7 @@ public class TextSimilarityPageBase : ComponentBase, IDisposable
         IsComparing = true;
 
         DbResp.Clear();
-        var results = Api.StreamTextSimilarityFromDbAsync(DbReq);
+        var results = Api.StreamTextAnalysisFromDbAsync(DbReq);
         await foreach (var item in results)
         {
             Logger.LogInformation(item.Text);
@@ -181,7 +181,7 @@ public class TextSimilarityPageBase : ComponentBase, IDisposable
         LlmResp = "Querying..";
 
         //await Chat.StartStreamTextSimilarityLlmAsync(LlmReq);
-        var stream = Api.StreamTextSimilarityToLlmAsync(LlmReq);
+        var stream = Api.StreamTextAnalysisToLlmAsync(LlmReq);
         LlmResp = string.Empty;
         await foreach(var item in stream)
         {
