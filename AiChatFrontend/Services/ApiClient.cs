@@ -274,7 +274,7 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
     public async IAsyncEnumerable<TextAnalysisSimilarityResult> StreamTextAnalysisFromDbAsync(TextAnalysisVdbRequest req)
     {
         var httpClient = fac.CreateClient(NAME);
-        var results = httpClient.PostAsAsyncEnumerable<TextAnalysisSimilarityResult>($"{EMBEDDING_TEXT}/query-from-db", req, default);
+        var results = httpClient.PostAsAsyncEnumerable<TextAnalysisSimilarityResult>($"{EMBEDDING_TEXT}/query-vector-db", req, default);
 
         await foreach (var r in results)
         {
@@ -285,7 +285,7 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
     public async IAsyncEnumerable<string> StreamTextAnalysisToLlmAsync(TextAnalysisLlmRequest req)
     {
         var httpClient = fac.CreateClient(NAME);
-        var results = httpClient.PostAsAsyncEnumerable<string>($"{EMBEDDING_TEXT}/query-to-llm", req, default);
+        var results = httpClient.PostAsAsyncEnumerable<string>($"{EMBEDDING_TEXT}/query-llm", req, default);
 
         await foreach(var r in results)
         {

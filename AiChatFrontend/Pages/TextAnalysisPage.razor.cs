@@ -6,7 +6,7 @@ namespace AiChatFrontend.Pages;
 
 public class TextAnalysisPageBase : ComponentBase, IDisposable
 {
-    [Inject] public ILogger<TextSimilarityPage> Logger { get; set; }
+    [Inject] public ILogger<TextAnalysisPageBase> Logger { get; set; }
     [Inject] public ApiClient Api { get; set; }
     [Inject] public IToaster Toastr { get; set; }
     //[Inject] public ChatService Chat { get; set; }
@@ -157,7 +157,6 @@ public class TextAnalysisPageBase : ComponentBase, IDisposable
         var results = Api.StreamTextAnalysisFromDbAsync(DbReq);
         await foreach (var item in results)
         {
-            Logger.LogInformation(item.Text);
             DbResp.Add(item);
             StateHasChanged();
         }
