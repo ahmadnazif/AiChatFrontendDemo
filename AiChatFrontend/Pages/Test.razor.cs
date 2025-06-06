@@ -12,7 +12,7 @@ public class TestBase : ComponentBase
 
     protected async Task StreamGetAsync()
     {
-        await foreach(var item in Api.StreamGetAsync())
+        await foreach(var item in Api.StreamGetAsync(30))
         {
             StreamGet += item;
             Logger.LogInformation($"GET: {item}");
@@ -22,7 +22,7 @@ public class TestBase : ComponentBase
 
     protected async Task StreamPostAsync()
     {
-        await foreach (var item in Api.StreamPostAsync())
+        await foreach (var item in Api.StreamPostAsync(30))
         {
             StreamPost += item;
             Logger.LogInformation($"POST: {item}");

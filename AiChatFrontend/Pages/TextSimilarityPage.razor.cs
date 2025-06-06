@@ -9,8 +9,8 @@ public class TextSimilarityPageBase : ComponentBase, IDisposable
     [Inject] public ILogger<TextSimilarityPage> Logger { get; set; }
     [Inject] public ApiClient Api { get; set; }
     [Inject] public IToaster Toastr { get; set; }
-    [Inject] public ChatService Chat { get; set; }
-    [Inject] public SessionService Session { get; set; }
+    //[Inject] public ChatService Chat { get; set; }
+    //[Inject] public SessionService Session { get; set; }
     protected bool IsApiConnected { get; set; }
     protected List<LlmModel> Models { get; set; } = [];
     protected IEnumerable<string> TextModelIds { get; set; } = [];
@@ -26,7 +26,7 @@ public class TextSimilarityPageBase : ComponentBase, IDisposable
     protected TextSimilarityVectorDbRequest DbReq { get; set; } = new() { Top = 5 };
     protected List<TextSimilarityResult> DbResp { get; set; } = [];
     protected TextSimilarityLlmRequest LlmReq { get; set; } = new();
-    protected string LlmResp { get; set; }
+    protected string LlmResp { get; set; } = "Please initiate the query";
     protected string ButtonLabelStore => IsStoring ? "Upserting.." : "Upsert";
     protected string ButtonLabelCompare => IsComparing ? "Processing.." : "Process";
     protected string ButtonLlmQuery => IsLlmQuerying ? "Querying.." : "Query";
@@ -46,16 +46,16 @@ public class TextSimilarityPageBase : ComponentBase, IDisposable
 
         try
         {
-            var tempUsername = Guid.NewGuid().ToString().Split("-")[0];
-            await Session.ConnectAsync(tempUsername);
-            Chat.OnTextSimilarityChatReceived += OnChatReceived;
+            //var tempUsername = Guid.NewGuid().ToString().Split("-")[0];
+            //await Session.ConnectAsync(tempUsername);
+            //Chat.OnTextSimilarityChatReceived += OnChatReceived;
 
             await RefreshModelsAsync();
             await RefreshTextVectorAsync();
         }
         catch (Exception ex)
         {
-            Chat.OnTextSimilarityChatReceived -= OnChatReceived;
+            //Chat.OnTextSimilarityChatReceived -= OnChatReceived;
             LogError(ex.Message);
         }
     }
@@ -178,15 +178,22 @@ public class TextSimilarityPageBase : ComponentBase, IDisposable
         LlmReq.OriginalPrompt = DbReq.Prompt;
         LlmReq.Results = [.. DbResp.Select(x => x.Text)];
 
-        LlmResp = string.Empty;
+        LlmResp = "Querying..";
 
-        await Chat.StartStreamTextSimilarityLlmAsync(LlmReq);
+        //await Chat.StartStreamTextSimilarityLlmAsync(LlmReq);
+        var stream = Api.StreamTextSimilarityToLlmAsync(LlmReq);
+        LlmResp = string.Empty;
+        await foreach(var item in stream)
+        {
+            LlmResp += item;
+            StateHasChanged();
+        }
     }
     #endregion
 
     public void Dispose()
     {
-        Chat.OnTextSimilarityChatReceived -= OnChatReceived;
+        //Chat.OnTextSimilarityChatReceived -= OnChatReceived;
         GC.SuppressFinalize(this);
         Log("Disposed");
     }

@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using Microsoft.AspNetCore.Components.WebAssembly.Http;
+using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 
 namespace AiChatFrontend.Extensions;
@@ -7,12 +8,14 @@ public static class HttpClientExtension
 {
     public static async IAsyncEnumerable<T> PostAsAsyncEnumerable<T>(this HttpClient httpClient, string url, object body, [EnumeratorCancellation] CancellationToken ct)
     {
-        HttpRequestMessage req = new(HttpMethod.Post, url)
+        HttpRequestMessage request = new(HttpMethod.Post, url)
         {
             Content = JsonContent.Create(body)
         };
 
-        var response = await httpClient.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, ct);
+        request.SetBrowserResponseStreamingEnabled(true);
+
+        var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
 
         response.EnsureSuccessStatusCode();
         var stream = await response.Content.ReadAsStreamAsync(ct);

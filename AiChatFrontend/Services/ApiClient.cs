@@ -293,10 +293,10 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         }
     }
 
-    public async IAsyncEnumerable<string> StreamPostAsync()
+    public async IAsyncEnumerable<string> StreamPostAsync(int max)
     {
         var httpClient = fac.CreateClient(NAME);
-        var results = httpClient.PostAsAsyncEnumerable<string>($"{EMBEDDING_TEXT}/stream-post", null, default);
+        var results = httpClient.PostAsAsyncEnumerable<string>($"{EMBEDDING_TEXT}/stream-post", max, default);
 
         await foreach (var r in results)
         {
@@ -304,10 +304,10 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         }
     }
 
-    public async IAsyncEnumerable<string> StreamGetAsync()
+    public async IAsyncEnumerable<string> StreamGetAsync(int max)
     {
         var httpClient = fac.CreateClient(NAME);
-        var results = httpClient.GetFromJsonAsAsyncEnumerable<string>($"{EMBEDDING_TEXT}/stream-get", default);
+        var results = httpClient.GetFromJsonAsAsyncEnumerable<string>($"{EMBEDDING_TEXT}/stream-get?max={max}", default);
 
         await foreach (var r in results)
         {
