@@ -143,7 +143,7 @@ public class TextAnalysisPageBase : ComponentBase, IDisposable
     #endregion
 
     #region Step 2
-    protected async Task QueryFromVectorDbAsync()
+    protected async Task QueryVectorDbAsync()
     {
         if (string.IsNullOrWhiteSpace(DbReq.Prompt))
         {
@@ -154,7 +154,7 @@ public class TextAnalysisPageBase : ComponentBase, IDisposable
         IsComparing = true;
 
         DbResp.Clear();
-        var results = Api.StreamTextAnalysisFromDbAsync(DbReq);
+        var results = Api.StreamTextAnalysisQdbAsync(DbReq);
         await foreach (var item in results)
         {
             DbResp.Add(item);
@@ -166,7 +166,7 @@ public class TextAnalysisPageBase : ComponentBase, IDisposable
     #endregion
 
     #region Final
-    protected async Task QueryToLlmAsync()
+    protected async Task QueryLlmAsync()
     {
         if (string.IsNullOrWhiteSpace(DbReq.Prompt))
         {
@@ -180,7 +180,7 @@ public class TextAnalysisPageBase : ComponentBase, IDisposable
         LlmResp = "Querying..";
 
         //await Chat.StartStreamTextSimilarityLlmAsync(LlmReq);
-        var stream = Api.StreamTextAnalysisToLlmAsync(LlmReq);
+        var stream = Api.StreamTextAnalysisLlmAsync(LlmReq);
         LlmResp = string.Empty;
         await foreach(var item in stream)
         {

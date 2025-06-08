@@ -153,7 +153,7 @@
                 </div>
                 <div class="col">
                     <label>&nbsp;</label><br />
-                    <button class="btn btn-success" @onclick="async() => await QueryFromVectorDbAsync()" disabled="@IsComparing">@ButtonLabelCompare</button>
+                    <button class="btn btn-success" @onclick="async() => await QueryVectorDbAsync()" disabled="@IsComparing">@ButtonLabelCompare</button>
                 </div>
             </div>
         </div>
@@ -209,14 +209,13 @@
                 </div>
                 <div class="col">
                     <label>&nbsp;</label><br />
-                    <button class="btn btn-success" @onclick="async() => await QueryToLlmAsync()" disabled="@IsLlmQuerying">@ButtonLlmQuery</button>
+                    <button class="btn btn-success" @onclick="async() => await QueryLlmAsync()" disabled="@IsLlmQuerying">@ButtonLlmQuery</button>
                 </div>
             </div>
         </div>
     </div>
     <div class="col">
-        @*<textarea  class="form-control" readonly rows="15" style="resize:none">@LlmResp</textarea>*@
-        <label>@LlmResp</label>
+        <textarea  class="form-control" readonly rows="15" style="resize:none">@LlmResp</textarea>
     </div>
 </div>
 
