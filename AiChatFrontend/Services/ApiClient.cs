@@ -232,23 +232,12 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         }
     }
 
-    public async IAsyncEnumerable<TextAnalysisSimilarityResult> StreamTextAnalysisVdbAsync(TextAnalysisVdbRequest req)
+    public async IAsyncEnumerable<TextAnalysisSimilarityResult> StreamTextAnalysisVdbAsync(VdbRequest req)
     {
         var httpClient = fac.CreateClient(NAME);
         var results = httpClient.PostAsAsyncEnumerable<TextAnalysisSimilarityResult>($"{EMBEDDING_TEXT}/query-vector-db", req, default);
 
         await foreach (var r in results)
-        {
-            yield return r;
-        }
-    }
-
-    public async IAsyncEnumerable<string> StreamTextAnalysisLlmAsyncOld(TextAnalysisLlmRequest req, [EnumeratorCancellation] CancellationToken ct)
-    {
-        var httpClient = fac.CreateClient(NAME);
-        var results = httpClient.PostAsAsyncEnumerable<string>($"{EMBEDDING_TEXT}/query-llm", req, ct);
-
-        await foreach(var r in results)
         {
             yield return r;
         }
@@ -306,6 +295,19 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
             return false;
         }
     }
+
+    public IAsyncEnumerable<RecipeVdbQueryResult> QueryRecipeVdbAsync(VdbRequest req, CancellationToken ct)
+    {
+        var httpClient = fac.CreateClient(NAME);
+        return httpClient.PostAsAsyncEnumerable<RecipeVdbQueryResult>($"{RAG_RECIPE}/query-vector-db", req, ct);
+    }
+
+    public IAsyncEnumerable<StreamingChatResponse> QueryRecipeLlmAsync(VdbRequest req, CancellationToken ct)
+    {
+        var httpClient = fac.CreateClient(NAME);
+        return httpClient.PostAsAsyncEnumerable<StreamingChatResponse>($"{RAG_RECIPE}/query-llm", req, ct);
+    }
+
 
     #endregion
 
