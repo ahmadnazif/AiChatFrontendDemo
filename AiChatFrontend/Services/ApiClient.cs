@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Xml.Linq;
 
@@ -271,7 +272,7 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         }
     }
 
-    public async IAsyncEnumerable<TextAnalysisSimilarityResult> StreamTextAnalysisQdbAsync(TextAnalysisVdbRequest req)
+    public async IAsyncEnumerable<TextAnalysisSimilarityResult> StreamTextAnalysisVdbAsync(TextAnalysisVdbRequest req)
     {
         var httpClient = fac.CreateClient(NAME);
         var results = httpClient.PostAsAsyncEnumerable<TextAnalysisSimilarityResult>($"{EMBEDDING_TEXT}/query-vector-db", req, default);
@@ -282,15 +283,21 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         }
     }
 
-    public async IAsyncEnumerable<string> StreamTextAnalysisLlmAsync(TextAnalysisLlmRequest req)
+    public async IAsyncEnumerable<string> StreamTextAnalysisLlmAsyncOld(TextAnalysisLlmRequest req, [EnumeratorCancellation] CancellationToken ct)
     {
         var httpClient = fac.CreateClient(NAME);
-        var results = httpClient.PostAsAsyncEnumerable<string>($"{EMBEDDING_TEXT}/query-llm", req, default);
+        var results = httpClient.PostAsAsyncEnumerable<string>($"{EMBEDDING_TEXT}/query-llm", req, ct);
 
         await foreach(var r in results)
         {
             yield return r;
         }
+    }
+
+    public IAsyncEnumerable<StreamingChatResponse> StreamTextAnalysisLlmAsync(TextAnalysisLlmRequest req, CancellationToken ct)
+    {
+        var httpClient = fac.CreateClient(NAME);
+        return httpClient.PostAsAsyncEnumerable<StreamingChatResponse>($"{EMBEDDING_TEXT}/query-llm", req, ct);
     }
 
     public async IAsyncEnumerable<string> StreamPostAsync(int max)

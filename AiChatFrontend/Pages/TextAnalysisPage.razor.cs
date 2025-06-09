@@ -4,13 +4,11 @@ using Sotsera.Blazor.Toaster;
 
 namespace AiChatFrontend.Pages;
 
-public class TextAnalysisPageBase : ComponentBase, IDisposable
+public class TextAnalysisPageBase : ComponentBase
 {
     [Inject] public ILogger<TextAnalysisPageBase> Logger { get; set; }
     [Inject] public ApiClient Api { get; set; }
     [Inject] public IToaster Toastr { get; set; }
-    //[Inject] public ChatService Chat { get; set; }
-    //[Inject] public SessionService Session { get; set; }
     protected bool IsApiConnected { get; set; }
     protected List<LlmModel> Models { get; set; } = [];
     protected IEnumerable<string> TextModelIds { get; set; } = [];
@@ -20,17 +18,17 @@ public class TextAnalysisPageBase : ComponentBase, IDisposable
     protected List<TextVector> TextVectors { get; set; } = [];
     protected bool IsStoring { get; set; } = false;
     protected string TextToStore { get; set; } = null;
-    protected bool IsComparing { get; set; } = false;
     protected bool IsAutoPopulating { get; set; } = false;
+    protected bool IsVdbQuerying { get; set; } = false;
     protected bool IsLlmQuerying { get; set; } = false;
-    protected TextAnalysisVdbRequest DbReq { get; set; } = new() { Top = 5 };
-    protected List<TextAnalysisSimilarityResult> DbResp { get; set; } = [];
+    protected TextAnalysisVdbRequest VdbReq { get; set; } = new() { Top = 1 };
+    protected List<TextAnalysisSimilarityResult> VdbResp { get; set; } = [];
     protected TextAnalysisLlmRequest LlmReq { get; set; } = new();
     protected string LlmResp { get; set; } = "Please initiate the query";
-    protected string ButtonLabelStore => IsStoring ? "Upserting.." : "Upsert";
-    protected string ButtonLabelCompare => IsComparing ? "Processing.." : "Process";
+    protected string ButtonStore => IsStoring ? "Upserting.." : "Upsert";
+    protected string ButtonVdbQuery => IsVdbQuerying ? "Querying.." : "Query";
     protected string ButtonLlmQuery => IsLlmQuerying ? "Querying.." : "Query";
-    protected string ButtonLabelAutoPopulate => IsAutoPopulating ? "Generating.." : "Generate & Upsert";
+    protected string ButtonAutoPopulate => IsAutoPopulating ? "Generating.." : "Generate & Upsert";
     protected AutoPopulateStatementRequest AutoPopulateRequest { get; set; } = new()
     {
         ModelId = string.Empty,
@@ -44,37 +42,8 @@ public class TextAnalysisPageBase : ComponentBase, IDisposable
     {
         IsApiConnected = await Api.IsConnectedAsync();
 
-        try
-        {
-            //var tempUsername = Guid.NewGuid().ToString().Split("-")[0];
-            //await Session.ConnectAsync(tempUsername);
-            //Chat.OnTextSimilarityChatReceived += OnChatReceived;
-
-            await RefreshModelsAsync();
-            await RefreshTextVectorAsync();
-        }
-        catch (Exception ex)
-        {
-            //Chat.OnTextSimilarityChatReceived -= OnChatReceived;
-            LogError(ex.Message);
-        }
-    }
-
-    private void OnChatReceived(object sender, StreamingChatReceivedEventArgs e)
-    {
-        LlmResp += e.Response.Message.Text;
-        StateHasChanged();
-    }
-
-    private void Log(string text) => Logger.LogInformation($"{DateTime.Now.ToLongTimeString()} || {text}");
-
-    private void LogError(string text, bool isCritical = false)
-    {
-        var log = $"{DateTime.Now.ToLongTimeString()} || {text}";
-        if (isCritical)
-            Logger.LogCritical(log);
-        else
-            Logger.LogError(log);
+        await RefreshModelsAsync();
+        await RefreshVectorsAsync();
     }
 
     private async Task RefreshModelsAsync()
@@ -86,12 +55,13 @@ public class TextAnalysisPageBase : ComponentBase, IDisposable
         MultimodalModelId = LlmModelHelper.GetDefaulModelId(Models, LlmModelType.Multimodal);
     }
 
-    private async Task RefreshTextVectorAsync()
+    private async Task RefreshVectorsAsync()
     {
         TextVectors = await Api.ListAllTextVectorFromCacheAsync();
     }
 
     #region Step 1
+
     protected async Task StoreTextAsync()
     {
         if (string.IsNullOrWhiteSpace(TextToStore))
@@ -105,7 +75,7 @@ public class TextAnalysisPageBase : ComponentBase, IDisposable
         if (resp.IsSuccess)
         {
             Toastr.Success(resp.Message);
-            await RefreshTextVectorAsync();
+            await RefreshVectorsAsync();
         }
         else
             Toastr.Error(resp.Message);
@@ -119,13 +89,13 @@ public class TextAnalysisPageBase : ComponentBase, IDisposable
         if (resp.IsSuccess)
         {
             Toastr.Success($"Item {key} deleted");
-            await RefreshTextVectorAsync();
+            await RefreshVectorsAsync();
         }
         else
             Toastr.Error(resp.Message);
     }
 
-    protected async Task AutoPopulateStatementAsync()
+    protected async Task AutoPopulateAsync()
     {
         IsAutoPopulating = true;
 
@@ -133,68 +103,76 @@ public class TextAnalysisPageBase : ComponentBase, IDisposable
         if (resp.IsSuccess)
         {
             Toastr.Success(resp.Message);
-            await RefreshTextVectorAsync();
+            await RefreshVectorsAsync();
         }
         else
             Toastr.Error(resp.Message);
 
         IsAutoPopulating = false;
     }
+   
     #endregion
 
     #region Step 2
+
     protected async Task QueryVectorDbAsync()
     {
-        if (string.IsNullOrWhiteSpace(DbReq.Prompt))
+        if (string.IsNullOrWhiteSpace(VdbReq.Prompt))
         {
             Toastr.Warning("Query text is required");
             return;
         }
 
-        IsComparing = true;
+        IsVdbQuerying = true;
 
-        DbResp.Clear();
-        var results = Api.StreamTextAnalysisQdbAsync(DbReq);
+        VdbResp.Clear();
+        var results = Api.StreamTextAnalysisVdbAsync(VdbReq);
         await foreach (var item in results)
         {
-            DbResp.Add(item);
+            VdbResp.Add(item);
             StateHasChanged();
         }
 
-        IsComparing = false;
+        IsVdbQuerying = false;
     }
+    
     #endregion
 
     #region Final
+
+    private CancellationTokenSource ctsQueryLlm;
+
     protected async Task QueryLlmAsync()
     {
-        if (string.IsNullOrWhiteSpace(DbReq.Prompt))
+        if (string.IsNullOrWhiteSpace(VdbReq.Prompt))
         {
             Toastr.Warning("Query text is required");
             return;
         }
 
-        LlmReq.OriginalPrompt = DbReq.Prompt;
-        LlmReq.Results = [.. DbResp.Select(x => x.Text)];
+        ctsQueryLlm = new();
 
+        LlmReq.OriginalPrompt = VdbReq.Prompt;
+        LlmReq.Results = [.. VdbResp.Select(x => x.Text)];
+
+        IsLlmQuerying = true;
         LlmResp = "Querying..";
 
-        //await Chat.StartStreamTextSimilarityLlmAsync(LlmReq);
-        var stream = Api.StreamTextAnalysisLlmAsync(LlmReq);
+        var stream = Api.StreamTextAnalysisLlmAsync(LlmReq, ctsQueryLlm.Token);
         LlmResp = string.Empty;
-        await foreach(var item in stream)
+        await foreach (var item in stream)
         {
-            LlmResp += item;
+            LlmResp += item.Message.Text;
+            IsLlmQuerying = !item.HasFinished;
             StateHasChanged();
         }
     }
-    #endregion
 
-    public void Dispose()
+    protected void StopQueryLlm()
     {
-        //Chat.OnTextSimilarityChatReceived -= OnChatReceived;
-        GC.SuppressFinalize(this);
-        Log("Disposed");
+        ctsQueryLlm.Cancel();
+        IsLlmQuerying = false;
     }
-
+   
+    #endregion
 }

@@ -1,224 +1,240 @@
 ﻿@page "/text-analysis"
 @inherits TextAnalysisPageBase
 
-<div class="alert alert-info">
-    Text vector is stored to in-memory vector database via <a href="https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/out-of-the-box-connectors/inmemory-connector?pivots=programming-language-csharp" target="_blank">Semantic Kernel In-Memory connector (preview version)</a>.
-    When backend API is restarted, stored vector data is gone.
-    <ul>
-        <li>Embeddng model: <code>@EmbeddingModelId</code></li>
-        <li>Embedding generator: Ollama Embedding Generator via <code> Microsoft.Extensions.AI</code> library</li>
-        <li>Distance function: Cosine Similarity</li>
-        <li>Index kind: HNSW</li>
-    </ul>
-</div>
-<h3><strong>RAG:</strong> Text Analysis <span class="badge badge-info">In-Memory Vector DB</span></h3>
-<h6>
-    A text will be transformed into embedding vector using <code>@EmbeddingModelId</code>, then stored in vector database for further analysis.
-    The result is solely obtained from vector database and not further processed to <code>@MultimodalModelId</code>
-</h6>
-
-<br />
-<br />
-<h5><strong>Step 1:</strong> Feed to vector database</h5>
-<label class="mb-3">This text will be stored to vector database</label>
-<div class="row">
-    <div class="col-sm-5">
-        <div class="row mb-3">
-            <div class="col">
-                <div class="card card-body">
-                    <div class="mb-2">Option 1: Enter your statement text</div>
-                    <div class="input-group">
-                        <input class="form-control" placeholder="Enter text to store" @bind="TextToStore" />
-                        <button class="btn btn-success" @onclick="async() => await StoreTextAsync()" disabled="@IsStoring">@ButtonLabelStore</button>
-                    </div>
-                    @*<small class="text-muted">Enter text to store</small>*@
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <div class="card card-body">
-                    <div class="mb-2">Option 2: Auto populate statement via Ollama model</div>
-                    <div class="row mb-2">
-                        <div class="col">
-                            <label class="text-muted">Model ID</label>
-                            <select class="form-select" @bind="AutoPopulateRequest.ModelId">
-                                <option value="">Default model</option>
-                                @foreach (var model in TextModelIds)
-                                {
-                                    <option value="@model">@model</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="col">
-                            <label class="text-muted">Generate total</label>
-                            <select class="form-select" @bind="AutoPopulateRequest.Number">
-                                <option value="5">5 statements</option>
-                                <option value="15">15 statements</option>
-                                <option value="30">30 statements</option>
-                            </select>
-                        </div>
-                        <div class="col">
-                            <label class="text-muted">Statement length</label>
-                            <select class="form-select" @bind="AutoPopulateRequest.Length">
-                                <option value="@TextGenerationLength.Shortest">Shortest</option>
-                                <option value="@TextGenerationLength.Short">Normal</option>
-                                <option value="@TextGenerationLength.Long">Long</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col">
-                            <label class="text-muted">Topic</label>
-                            <select class="form-select" @bind="AutoPopulateRequest.Topic">
-                                <option value="Random">Random</option>
-                                @foreach (var topic in ChatHelper.Topics.Order())
-                                {
-                                    <option value="@topic">@topic</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="col">
-                            <label class="text-muted">Language</label>
-                            <select class="form-select" @bind="AutoPopulateRequest.Language">
-                                <option value="English">English</option>
-                                <option value="Malay">Malay</option>
-                            </select>
-                        </div>
-                        <div class="col">
-                            <label>&nbsp;</label><br />
-                            <button class="btn btn-success" @onclick="async() => await AutoPopulateStatementAsync()" disabled="@IsAutoPopulating">@ButtonLabelAutoPopulate</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+@if (!IsApiConnected)
+{
+    <div class="alert alert-danger">
+        Backend API is not connected
     </div>
-    <div class="col">
-        <table class="table table-bordered table-sm">
-            <thead class="table-dark">
-                <tr>
-                    <th>Action</th>
-                    <th>Text</th>
-                    <th>ID</th>
-                    <th>Vector Dimension</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (TextVectors.Count == 0)
-                {
-                    <span>
-                        <label><i>No data in vector database</i></label>
-                    </span>
-                }
-                else
-                {
-                    foreach (var data in TextVectors)
+}
+else
+{
+    <div class="alert alert-info">
+        Text vector is stored to in-memory vector database via <a href="https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/out-of-the-box-connectors/inmemory-connector?pivots=programming-language-csharp" target="_blank">Semantic Kernel In-Memory connector (preview version)</a>.
+        When backend API is restarted, stored vector data is gone.
+        <ul>
+            <li>Embeddng model: <code>@EmbeddingModelId</code></li>
+            <li>Embedding generator: Ollama Embedding Generator via <code> Microsoft.Extensions.AI</code> library</li>
+            <li>Distance function: Cosine Similarity</li>
+            <li>Index kind: HNSW</li>
+        </ul>
+    </div>
+    <h3><strong>RAG:</strong> Text Analysis <span class="badge bg-secondary rounded-pill">In-Memory Vector DB</span></h3>
+    <h6>
+        A text will be transformed into embedding vector using <code>@EmbeddingModelId</code>, then stored in vector database for further analysis.
+        It then queried then sent to LLM for further processing
+    </h6>
+
+    <br />
+    <br />
+    <h5><strong>Step 1:</strong> Feed to vector database</h5>
+    <label class="mb-3">This text will be stored to vector database</label>
+    <div class="row">
+        <div class="col-sm-5">
+            <div class="row mb-3">
+                <div class="col">
+                    <div class="card card-body">
+                        <div class="mb-2">Option 1: Enter your statement text</div>
+                        <div class="input-group">
+                            <input class="form-control" placeholder="Enter text to store" @bind="TextToStore" />
+                            <button class="btn btn-success" @onclick="async () => await StoreTextAsync()" disabled="@IsStoring">@ButtonStore</button>
+                        </div>
+                        @*<small class="text-muted">Enter text to store</small>*@
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="card card-body">
+                        <div class="mb-2">Option 2: Auto populate statement via Ollama model</div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label class="text-muted">Model ID</label>
+                                <select class="form-select" @bind="AutoPopulateRequest.ModelId">
+                                    <option value="">Default model</option>
+                                    @foreach (var model in TextModelIds)
+                                    {
+                                        <option value="@model">@model</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col">
+                                <label class="text-muted">Generate total</label>
+                                <select class="form-select" @bind="AutoPopulateRequest.Number">
+                                    <option value="5">5 statements</option>
+                                    <option value="15">15 statements</option>
+                                    <option value="30">30 statements</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <label class="text-muted">Statement length</label>
+                                <select class="form-select" @bind="AutoPopulateRequest.Length">
+                                    <option value="@TextGenerationLength.Shortest">Shortest</option>
+                                    <option value="@TextGenerationLength.Short">Normal</option>
+                                    <option value="@TextGenerationLength.Long">Long</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <label class="text-muted">Topic</label>
+                                <select class="form-select" @bind="AutoPopulateRequest.Topic">
+                                    <option value="Random">Random</option>
+                                    @foreach (var topic in ChatHelper.Topics.Order())
+                                    {
+                                        <option value="@topic">@topic</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col">
+                                <label class="text-muted">Language</label>
+                                <select class="form-select" @bind="AutoPopulateRequest.Language">
+                                    <option value="English">English</option>
+                                    <option value="Malay">Malay</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <label>&nbsp;</label><br />
+                                <button class="btn btn-success" @onclick="async () => await AutoPopulateAsync()" disabled="@IsAutoPopulating">@ButtonAutoPopulate</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col">
+            <table class="table table-bordered table-sm">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Action</th>
+                        <th>Text</th>
+                        <th>ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (TextVectors.Count == 0)
                     {
-                        <tr>
-                            <td><button class="btn btn-sm btn-danger" @onclick="async () => await DeleteTextAsync(data.Id)">Delete</button></td>
-                            <td><strong>@data.Text</strong></td>
-                            <td>@data.Id</td>
-                            <td>@data.Vector.Length</td>
-                        </tr>
+                        <span>
+                            <label><i>No data in vector database</i></label>
+                        </span>
                     }
-                }
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<hr />
-<h5><strong>Step 2:</strong> Query from vector database</h5>
-<label class="mb-3">This text will be sent for analysis to check the similarity of it against data stored in vector database</label>
-<div class="row">
-    <div class="col-sm-5">
-        <div class="card card-body">
-            <div class="row mb-2">
-                <div class="col">
-                    <label>Enter a query text against above data</label>
-                    <input class="form-control" placeholder="Query text" @bind="DbReq.Prompt" />
-                </div>
-            </div>
-            <div class="row mb-2">
-                <div class="col">
-                    <label class="text-muted">TOP</label>
-                    <select class="form-select" @bind="DbReq.Top">
-                        <option value="1">1</option>
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                    </select>                    
-                </div>
-                <div class="col">
-                    <label>&nbsp;</label><br />
-                    <button class="btn btn-success" @onclick="async() => await QueryVectorDbAsync()" disabled="@IsComparing">@ButtonLabelCompare</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col">
-        <table class="table table-bordered table-sm">
-            <thead class="table-dark">
-                <tr>
-                    <th>Text</th>
-                    <th>ID</th>
-                    <th>Score</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (DbResp.Count == 0)
-                {
-                    <span>
-                        <label><i>No result yet</i></label>
-                    </span>
-                }
-                else
-                {
-                    foreach (var data in DbResp)
+                    else
                     {
-                        <tr>
-                            <td><strong>@data.Text</strong></td>
-                            <td>@data.Guid</td>
-                            <td>@data.Score</td>
-                        </tr>
-                    }
-                }
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<hr />
-<h5><strong>Final:</strong> Response from LLM</h5>
-<label class="mb-3">Original query will be enhanced with result obtained from vector database, then passed to LLM</label>
-<div class="row">
-    <div class="col-sm-5">
-        <div class="card card-body">
-            <div class="row mb-2">
-                <div class="col">
-                    <label class="text-muted">Model ID</label>
-                    <select class="form-select" @bind="LlmReq.ModelId">
-                        <option value="">Default model</option>
-                        @foreach (var model in TextModelIds)
+                        foreach (var data in TextVectors)
                         {
-                            <option value="@model">@model</option>
+                            <tr>
+                                <td><button class="btn btn-sm btn-danger" @onclick="async () => await DeleteTextAsync(data.Id)">Delete</button></td>
+                                <td><strong>@data.Text</strong></td>
+                                <td>@data.Id</td>
+                            </tr>
                         }
-                    </select>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <hr />
+    <h5><strong>Step 2:</strong> Query from vector database</h5>
+    <label class="mb-3">This text will be sent for analysis to check the similarity of it against data stored in vector database</label>
+    <div class="row">
+        <div class="col-sm-5">
+            <div class="card card-body">
+                <div class="row mb-2">
+                    <div class="col">
+                        <label>Enter a query text against above data</label>
+                        <input class="form-control" placeholder="Query text" @bind="VdbReq.Prompt" />
+                    </div>
                 </div>
-                <div class="col">
-                    <label>&nbsp;</label><br />
-                    <button class="btn btn-success" @onclick="async() => await QueryLlmAsync()" disabled="@IsLlmQuerying">@ButtonLlmQuery</button>
+                <div class="row mb-2">
+                    <div class="col">
+                        <label class="text-muted">TOP</label>
+                        <select class="form-select" @bind="VdbReq.Top">
+                            <option value="1">1</option>
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label>&nbsp;</label><br />
+                        <button class="btn btn-success" @onclick="async () => await QueryVectorDbAsync()" disabled="@IsVdbQuerying">@ButtonVdbQuery</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <table class="table table-bordered table-sm">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Text</th>
+                        <th>ID</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (VdbResp.Count == 0)
+                    {
+                        <span>
+                            <label><i>No result yet</i></label>
+                        </span>
+                    }
+                    else
+                    {
+                        foreach (var data in VdbResp)
+                        {
+                            <tr>
+                                <td><strong>@data.Text</strong></td>
+                                <td>@data.Guid</td>
+                                <td>@data.Score</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <hr />
+    <h5><strong>Final:</strong> Response from LLM</h5>
+    <label class="mb-3">Original query will be enhanced with result obtained from vector database, then passed to LLM</label>
+    <div class="row">
+        <div class="col-sm-5">
+            <div class="card card-body">
+                <div class="row mb-2">
+                    <div class="col">
+                        <label class="text-muted">Model ID</label>
+                        <select class="form-select" @bind="LlmReq.ModelId">
+                            <option value="">Default model</option>
+                            @foreach (var model in TextModelIds)
+                            {
+                                <option value="@model">@model</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label>&nbsp;</label><br />
+                        <div class="input-group">
+                            <button class="btn btn-success" @onclick="async () => await QueryLlmAsync()" disabled="@IsLlmQuerying">@ButtonLlmQuery</button>
+                            <button class="btn btn-danger" @onclick="() => StopQueryLlm()" disabled="@(!IsLlmQuerying)">Stop</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    Result
+                </div>
+                <div class="card-body">
+                    <textarea class="form-control" readonly rows="20" style="resize:none">@LlmResp</textarea>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col">
-        <textarea  class="form-control" readonly rows="15" style="resize:none">@LlmResp</textarea>
-    </div>
-</div>
-
+}
 
 
 <br />
