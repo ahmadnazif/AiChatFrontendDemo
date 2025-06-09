@@ -1,0 +1,35 @@
+﻿@page "/recipe-analysis"
+@inherits RecipeAnalysisPageBase
+
+@if (!IsApiConnected)
+{
+    <div class="alert alert-danger">
+        Backend API is not connected
+    </div>
+}
+else
+{
+    if (!IsQdrantConnected)
+    {
+        <div class="alert alert-danger">
+            Qdrant is not connected
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            Text vector is stored to Qdrant vector database via <a href="https://learn.microsoft.com/en-us/semantic-kernel/concepts/vector-store-connectors/out-of-the-box-connectors/qdrant-connector?pivots=programming-language-csharp" target="_blank">Semantic Kernel Qdrant connector (preview version)</a>.
+            <ul>
+                <li>Embeddnig model: <code>@EmbeddingModelId</code></li>
+                <li>Embedding generator: Ollama Embedding Generator via <code> Microsoft.Extensions.AI</code> library</li>
+                <li>Distance function: Cosine Similarity</li>
+                <li>Index kind: HNSW</li>
+            </ul>
+        </div>
+        <h3><strong>RAG:</strong> Recipe Analysis <span class="badge bg-secondary rounded-pill">Qdrant DB</span></h3>
+        <h6>
+            A text will be transformed into embedding vector using <code>@EmbeddingModelId</code>, then stored in vector database for further analysis.
+            It then queried then sent to LLM for further processing
+        </h6>
+    }
+}
