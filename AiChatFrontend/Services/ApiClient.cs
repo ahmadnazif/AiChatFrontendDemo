@@ -243,7 +243,7 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         }
     }
 
-    public IAsyncEnumerable<StreamingChatResponse> StreamTextAnalysisLlmAsync(TextAnalysisLlmRequest req, CancellationToken ct)
+    public IAsyncEnumerable<StreamingChatResponse> StreamTextAnalysisLlmAsync(LlmRequest req, CancellationToken ct)
     {
         var httpClient = fac.CreateClient(NAME);
         return httpClient.PostAsAsyncEnumerable<StreamingChatResponse>($"{EMBEDDING_TEXT}/query-llm", req, ct);

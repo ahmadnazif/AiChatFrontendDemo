@@ -1,6 +1,6 @@
 ﻿namespace AiChatFrontend.Models;
 
-public class TextAnalysisLlmRequest
+public class LlmRequest
 {
     public string? OriginalPrompt { get; set; }
     public List<string> Results { get; set; }

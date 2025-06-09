@@ -23,7 +23,7 @@ public class TextAnalysisPageBase : ComponentBase
     protected bool IsLlmQuerying { get; set; } = false;
     protected VdbRequest VdbReq { get; set; } = new() { Top = 1 };
     protected List<TextAnalysisSimilarityResult> VdbResp { get; set; } = [];
-    protected TextAnalysisLlmRequest LlmReq { get; set; } = new();
+    protected LlmRequest LlmReq { get; set; } = new();
     protected string LlmResp { get; set; } = "Please initiate the query";
     protected string ButtonStore => IsStoring ? "Upserting.." : "Upsert";
     protected string ButtonVdbQuery => IsVdbQuerying ? "Querying.." : "Query";
