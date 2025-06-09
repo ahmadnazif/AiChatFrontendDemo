@@ -156,46 +156,6 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
     public const string EMBEDDING = "embedding";
     public const string EMBEDDING_TEXT = $"{EMBEDDING}/text";
 
-    [Obsolete]
-    public async Task<Dictionary<LlmModelType, string>> GetModelsDictionaryAsync()
-    {
-        try
-        {
-            var httpClient = fac.CreateClient(NAME);
-            var response = await httpClient.GetAsync($"{EMBEDDING}/get-models-dictionary");
-
-            if (response.IsSuccessStatusCode)
-                return await response.Content.ReadFromJsonAsync<Dictionary<LlmModelType, string>>();
-            else
-                return [];
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex.Message);
-            return [];
-        }
-    }
-
-    [Obsolete]
-    public async Task<string> GetModelNameAsync(LlmModelType type)
-    {
-        try
-        {
-            var httpClient = fac.CreateClient(NAME);
-            var response = await httpClient.GetAsync($"{EMBEDDING}/get-model-name?type={type}");
-
-            if (response.IsSuccessStatusCode)
-                return await response.Content.ReadAsStringAsync();
-            else
-                return null;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex.Message);
-            return null;
-        }
-    }
-
     public async Task<List<TextVector>> ListAllTextVectorFromCacheAsync()
     {
         try
@@ -319,6 +279,31 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         await foreach (var r in results)
         {
             yield return r;
+        }
+    }
+
+    #endregion
+
+    #region rag/recipe
+    public const string RAG = "rag";
+    public const string RAG_RECIPE = $"{RAG}/recipe";
+
+    public async Task<bool> IsQdrantRunningAsync()
+    {
+        try
+        {
+            var httpClient = fac.CreateClient(NAME);
+            var response = await httpClient.GetAsync($"{RAG_RECIPE}/is-qdrant-running");
+
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadFromJsonAsync<bool>();
+            else
+                return false;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.Message);
+            return false;
         }
     }
 
