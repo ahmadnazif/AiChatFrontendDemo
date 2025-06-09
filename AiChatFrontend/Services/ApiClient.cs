@@ -232,10 +232,10 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         }
     }
 
-    public async IAsyncEnumerable<TextAnalysisSimilarityResult> StreamTextAnalysisVdbAsync(VdbRequest req)
+    public async IAsyncEnumerable<TextAnalysisVdbQueryResult> StreamTextAnalysisVdbAsync(VdbRequest req)
     {
         var httpClient = fac.CreateClient(NAME);
-        var results = httpClient.PostAsAsyncEnumerable<TextAnalysisSimilarityResult>($"{EMBEDDING_TEXT}/query-vector-db", req, default);
+        var results = httpClient.PostAsAsyncEnumerable<TextAnalysisVdbQueryResult>($"{EMBEDDING_TEXT}/query-vector-db", req, default);
 
         await foreach (var r in results)
         {
@@ -302,7 +302,7 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         return httpClient.PostAsAsyncEnumerable<RecipeVdbQueryResult>($"{RAG_RECIPE}/query-vector-db", req, ct);
     }
 
-    public IAsyncEnumerable<StreamingChatResponse> QueryRecipeLlmAsync(VdbRequest req, CancellationToken ct)
+    public IAsyncEnumerable<StreamingChatResponse> QueryRecipeLlmAsync(LlmRequest req, CancellationToken ct)
     {
         var httpClient = fac.CreateClient(NAME);
         return httpClient.PostAsAsyncEnumerable<StreamingChatResponse>($"{RAG_RECIPE}/query-llm", req, ct);
