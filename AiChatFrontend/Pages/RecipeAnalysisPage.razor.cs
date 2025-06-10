@@ -10,7 +10,9 @@ public class RecipeAnalysisPageBase : ComponentBase
     [Inject] public ApiClient Api { get; set; }
     [Inject] public IToaster Toastr { get; set; }
     protected bool IsApiConnected { get; set; }
+    protected static string ApiLastCheck { get; set; } = DateTime.Now.ToLongTimeString();
     protected bool IsQdrantConnected { get; set; }
+    protected static string QdrantLastCheck { get; set; } = DateTime.Now.ToLongTimeString();
     protected List<LlmModel> Models { get; set; } = [];
     protected IEnumerable<string> TextModelIds { get; set; } = [];
     protected string EmbeddingModelId { get; set; } = "Getting..";
@@ -19,10 +21,16 @@ public class RecipeAnalysisPageBase : ComponentBase
 
     protected async override Task OnInitializedAsync()
     {
-        IsApiConnected = await Api.IsConnectedAsync();
-        IsQdrantConnected = await Api.IsQdrantRunningAsync();
-
+        await RefreshApiStatusAsync();
         await RefreshModelsAsync();
+    }
+
+    protected async Task RefreshApiStatusAsync()
+    {
+        IsApiConnected = await Api.IsConnectedAsync();
+        ApiLastCheck = DateTime.Now.ToLongTimeString();
+        IsQdrantConnected = await Api.IsQdrantRunningAsync();
+        QdrantLastCheck = DateTime.Now.ToLongTimeString();
     }
 
     private async Task RefreshModelsAsync()

@@ -4,7 +4,8 @@
 @if (!IsApiConnected)
 {
     <div class="alert alert-danger">
-        Backend API is not connected
+        Backend API is not connected. Last checked @ApiLastCheck&nbsp;
+        <button class="btn btn-sm btn-success" @onclick="async() => await RefreshApiStatusAsync()">Refresh</button>
     </div>
 }
 else
@@ -12,7 +13,8 @@ else
     if (!IsQdrantConnected)
     {
         <div class="alert alert-danger">
-            Qdrant is not connected
+            Qdrant is not connected. Last checked @QdrantLastCheck&nbsp;
+            <button class="btn btn-sm btn-success" @onclick="async() => await RefreshApiStatusAsync()">Refresh</button>
         </div>
     }
     else
