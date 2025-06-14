@@ -28,6 +28,9 @@ public class TextAnalysisPageBase : Component
 
     private async Task RefreshModelsAsync()
     {
+        if (!IsApiConnected)
+            return;
+
         Models = await Api.ListAllModelsAsync();
         EmbeddingModelId = LlmModelHelper.GetDefaulModelId(Models, LlmModelType.Embedding);
         TextModelIds = LlmModelHelper.GetModelIds(Models, LlmModelType.Text);
@@ -53,11 +56,14 @@ public class TextAnalysisPageBase : Component
 
     private async Task RefreshVectorsAsync()
     {
+        if (!IsApiConnected) return;
         TextVectors = await Api.ListAllTextVectorFromCacheAsync();
     }
 
     protected async Task StoreTextAsync()
     {
+        if (!IsApiConnected) return;
+
         if (string.IsNullOrWhiteSpace(TextToStore))
         {
             Toastr.Warning("Text to feed is required");
@@ -79,6 +85,8 @@ public class TextAnalysisPageBase : Component
 
     protected async Task DeleteTextAsync(Guid key)
     {
+        if (!IsApiConnected) return;
+
         var resp = await Api.DeleteTextVectorFromDbAsync(key.ToString());
         if (resp.IsSuccess)
         {
@@ -91,6 +99,8 @@ public class TextAnalysisPageBase : Component
 
     protected async Task AutoPopulateAsync()
     {
+        if (!IsApiConnected) return;
+
         IsAutoPopulating = true;
 
         var resp = await Api.AutoPopulateStatementToDbAsync(AutoPopulateRequest);
@@ -115,6 +125,8 @@ public class TextAnalysisPageBase : Component
 
     protected async Task QueryVectorDbAsync()
     {
+        if (!IsApiConnected) return;
+
         if (string.IsNullOrWhiteSpace(VdbReq.Prompt))
         {
             Toastr.Warning("Query text is required");
@@ -146,6 +158,8 @@ public class TextAnalysisPageBase : Component
 
     protected async Task QueryLlmAsync()
     {
+        if (!IsApiConnected) return;
+
         if (string.IsNullOrWhiteSpace(VdbReq.Prompt))
         {
             Toastr.Warning("Query text is required");
