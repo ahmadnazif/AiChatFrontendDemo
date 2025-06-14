@@ -4,6 +4,7 @@ global using AiChatFrontend.Enums;
 global using AiChatFrontend.Helpers;
 global using AiChatFrontend.Events;
 global using AiChatFrontend.Extensions;
+global using AiChatFrontend.Shared;
 using AiChatFrontend;
 using AiChatFrontend.Services;
 using Microsoft.AspNetCore.Components.Web;

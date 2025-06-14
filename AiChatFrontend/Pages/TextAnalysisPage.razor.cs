@@ -4,11 +4,8 @@ using Sotsera.Blazor.Toaster;
 
 namespace AiChatFrontend.Pages;
 
-public class TextAnalysisPageBase : ComponentBase
+public class TextAnalysisPageBase : Component
 {
-    [Inject] public ILogger<TextAnalysisPageBase> Logger { get; set; }
-    [Inject] public ApiClient Api { get; set; }
-    [Inject] public IToaster Toastr { get; set; }
     protected bool IsApiConnected { get; set; }
     protected static string ApiLastCheck { get; set; } = DateTime.Now.ToLongTimeString();
     protected List<LlmModel> Models { get; set; } = [];
