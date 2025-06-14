@@ -14,30 +14,7 @@ public class TextAnalysisPageBase : ComponentBase
     protected List<LlmModel> Models { get; set; } = [];
     protected IEnumerable<string> TextModelIds { get; set; } = [];
     protected string EmbeddingModelId { get; set; } = "Getting..";
-    protected string TextModelId { get; set; } = "Getting..";
     protected string MultimodalModelId { get; set; } = "Getting..";
-    protected List<TextVector> TextVectors { get; set; } = [];
-    protected bool IsStoring { get; set; } = false;
-    protected string TextToStore { get; set; } = null;
-    protected bool IsAutoPopulating { get; set; } = false;
-    protected bool IsVdbQuerying { get; set; } = false;
-    protected bool IsLlmQuerying { get; set; } = false;
-    protected VdbRequest VdbReq { get; set; } = new() { Top = 1 };
-    protected List<TextAnalysisVdbQueryResult> VdbResp { get; set; } = [];
-    protected LlmRequest LlmReq { get; set; } = new();
-    protected string LlmResp { get; set; } = "Please initiate the query";
-    protected string ButtonStore => IsStoring ? "Upserting.." : "Upsert";
-    protected string ButtonVdbQuery => IsVdbQuerying ? "Querying.." : "Query";
-    protected string ButtonLlmQuery => IsLlmQuerying ? "Querying.." : "Query";
-    protected string ButtonAutoPopulate => IsAutoPopulating ? "Generating.." : "Generate & Upsert";
-    protected AutoPopulateStatementRequest AutoPopulateRequest { get; set; } = new()
-    {
-        ModelId = string.Empty,
-        Number = 5,
-        Length = TextGenerationLength.Shortest,
-        Topic = "Random",
-        Language = "English"
-    };
 
     protected override async Task OnInitializedAsync()
     {
@@ -56,17 +33,31 @@ public class TextAnalysisPageBase : ComponentBase
     {
         Models = await Api.ListAllModelsAsync();
         EmbeddingModelId = LlmModelHelper.GetDefaulModelId(Models, LlmModelType.Embedding);
-        TextModelId = LlmModelHelper.GetDefaulModelId(Models, LlmModelType.Text);
         TextModelIds = LlmModelHelper.GetModelIds(Models, LlmModelType.Text);
         MultimodalModelId = LlmModelHelper.GetDefaulModelId(Models, LlmModelType.Multimodal);
     }
+
+
+    #region Step 1
+    protected List<TextVector> TextVectors { get; set; } = [];
+    protected bool IsUpserting { get; set; } = false;
+    protected string TextToStore { get; set; } = null;
+    protected bool IsAutoPopulating { get; set; } = false;
+    protected string ButtonUpsert => IsUpserting ? "Upserting.." : "Upsert";
+    protected string ButtonAutoPopulate => IsAutoPopulating ? "Generating.." : "Generate & Upsert";
+    protected AutoPopulateStatementRequest AutoPopulateRequest { get; set; } = new()
+    {
+        ModelId = string.Empty,
+        Number = 5,
+        Length = TextGenerationLength.Shortest,
+        Topic = "Random",
+        Language = "English"
+    };
 
     private async Task RefreshVectorsAsync()
     {
         TextVectors = await Api.ListAllTextVectorFromCacheAsync();
     }
-
-    #region Step 1
 
     protected async Task StoreTextAsync()
     {
@@ -76,7 +67,7 @@ public class TextAnalysisPageBase : ComponentBase
             return;
         }
 
-        IsStoring = true;
+        IsUpserting = true;
         var resp = await Api.StoreTextVectorToDbAsync(TextToStore);
         if (resp.IsSuccess)
         {
@@ -86,7 +77,7 @@ public class TextAnalysisPageBase : ComponentBase
         else
             Toastr.Error(resp.Message);
 
-        IsStoring = false;
+        IsUpserting = false;
     }
 
     protected async Task DeleteTextAsync(Guid key)
@@ -116,10 +107,14 @@ public class TextAnalysisPageBase : ComponentBase
 
         IsAutoPopulating = false;
     }
-   
+
     #endregion
 
     #region Step 2
+    protected bool IsVdbQuerying { get; set; } = false;
+    protected VdbRequest VdbReq { get; set; } = new() { Top = 1 };
+    protected string ButtonVdbQuery => IsVdbQuerying ? "Querying.." : "Query";
+    protected List<TextAnalysisVdbQueryResult> VdbResp { get; set; } = [];
 
     protected async Task QueryVectorDbAsync()
     {
@@ -141,10 +136,14 @@ public class TextAnalysisPageBase : ComponentBase
 
         IsVdbQuerying = false;
     }
-    
+
     #endregion
 
     #region Final
+    protected bool IsLlmQuerying { get; set; } = false;
+    protected LlmRequest LlmReq { get; set; } = new();
+    protected string LlmResp { get; set; } = "Please initiate the query";
+    protected string ButtonLlmQuery => IsLlmQuerying ? "Querying.." : "Query";
 
     private CancellationTokenSource ctsQueryLlm;
 
@@ -179,6 +178,6 @@ public class TextAnalysisPageBase : ComponentBase
         ctsQueryLlm.Cancel();
         IsLlmQuerying = false;
     }
-   
+
     #endregion
 }

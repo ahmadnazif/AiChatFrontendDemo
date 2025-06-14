@@ -38,7 +38,7 @@ else
                         <div class="mb-2">Option 1: Enter your statement text</div>
                         <div class="input-group">
                             <input class="form-control" placeholder="Enter text to store" @bind="TextToStore" />
-                            <button class="btn btn-success" @onclick="async () => await StoreTextAsync()" disabled="@IsStoring">@ButtonStore</button>
+                            <button class="btn btn-success" @onclick="async () => await StoreTextAsync()" disabled="@IsUpserting">@ButtonUpsert</button>
                         </div>
                         @*<small class="text-muted">Enter text to store</small>*@
                     </div>
