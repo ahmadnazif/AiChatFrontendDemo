@@ -152,16 +152,16 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
     }
     #endregion
 
-    #region embedding/text
-    public const string EMBEDDING = "embedding";
-    public const string EMBEDDING_TEXT = $"{EMBEDDING}/text";
+    #region rag/text-analysis
+    public const string RAG = "rag";
+    public const string RAG_TEXT = $"{RAG}/text-analysis";
 
     public async Task<List<TextVector>> ListAllTextVectorFromCacheAsync()
     {
         try
         {
             var httpClient = fac.CreateClient(NAME);
-            var response = await httpClient.GetAsync($"{EMBEDDING_TEXT}/list-all-from-cache");
+            var response = await httpClient.GetAsync($"{RAG_TEXT}/list-all-from-cache");
 
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadFromJsonAsync<List<TextVector>>();
@@ -180,7 +180,7 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         try
         {
             var httpClient = fac.CreateClient(NAME);
-            var response = await httpClient.PostAsJsonAsync($"{EMBEDDING_TEXT}/feed", text);
+            var response = await httpClient.PostAsJsonAsync($"{RAG_TEXT}/feed", text);
 
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadFromJsonAsync<ResponseBase>();
@@ -199,7 +199,7 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         try
         {
             var httpClient = fac.CreateClient(NAME);
-            var response = await httpClient.PostAsJsonAsync($"{EMBEDDING_TEXT}/auto-populate", req);
+            var response = await httpClient.PostAsJsonAsync($"{RAG_TEXT}/auto-populate", req);
 
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadFromJsonAsync<ResponseBase>();
@@ -218,7 +218,7 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         try
         {
             var httpClient = fac.CreateClient(NAME);
-            var response = await httpClient.DeleteAsync($"{EMBEDDING_TEXT}/delete?key={key}");
+            var response = await httpClient.DeleteAsync($"{RAG_TEXT}/delete?key={key}");
 
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadFromJsonAsync<ResponseBase>();
@@ -235,7 +235,7 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
     public async IAsyncEnumerable<TextAnalysisVdbQueryResult> StreamTextAnalysisVdbAsync(VdbRequest req)
     {
         var httpClient = fac.CreateClient(NAME);
-        var results = httpClient.PostAsAsyncEnumerable<TextAnalysisVdbQueryResult>($"{EMBEDDING_TEXT}/query-vector-db", req, default);
+        var results = httpClient.PostAsAsyncEnumerable<TextAnalysisVdbQueryResult>($"{RAG_TEXT}/query-vector-db", req, default);
 
         await foreach (var r in results)
         {
@@ -246,13 +246,13 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
     public IAsyncEnumerable<StreamingChatResponse> StreamTextAnalysisLlmAsync(LlmRequest req, CancellationToken ct)
     {
         var httpClient = fac.CreateClient(NAME);
-        return httpClient.PostAsAsyncEnumerable<StreamingChatResponse>($"{EMBEDDING_TEXT}/query-llm", req, ct);
+        return httpClient.PostAsAsyncEnumerable<StreamingChatResponse>($"{RAG_TEXT}/query-llm", req, ct);
     }
 
     public async IAsyncEnumerable<string> StreamPostAsync(int max)
     {
         var httpClient = fac.CreateClient(NAME);
-        var results = httpClient.PostAsAsyncEnumerable<string>($"{EMBEDDING_TEXT}/stream-post", max, default);
+        var results = httpClient.PostAsAsyncEnumerable<string>($"{RAG_TEXT}/stream-post", max, default);
 
         await foreach (var r in results)
         {
@@ -263,7 +263,7 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
     public async IAsyncEnumerable<string> StreamGetAsync(int max)
     {
         var httpClient = fac.CreateClient(NAME);
-        var results = httpClient.GetFromJsonAsAsyncEnumerable<string>($"{EMBEDDING_TEXT}/stream-get?max={max}", default);
+        var results = httpClient.GetFromJsonAsAsyncEnumerable<string>($"{RAG_TEXT}/stream-get?max={max}", default);
 
         await foreach (var r in results)
         {
@@ -274,7 +274,6 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
     #endregion
 
     #region rag/recipe
-    public const string RAG = "rag";
     public const string RAG_RECIPE = $"{RAG}/recipe";
 
     public async Task<bool> IsQdrantRunningAsync()

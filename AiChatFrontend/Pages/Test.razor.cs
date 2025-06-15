@@ -12,21 +12,21 @@ public class TestBase : ComponentBase
 
     protected async Task StreamGetAsync()
     {
-        await foreach(var item in Api.StreamGetAsync(30))
-        {
-            StreamGet += item;
-            Logger.LogInformation($"GET: {item}");
-            StateHasChanged();
-        }
+        //await foreach(var item in Api.StreamGetAsync(30))
+        //{
+        //    StreamGet += item;
+        //    Logger.LogInformation($"GET: {item}");
+        //    StateHasChanged();
+        //}
     }
 
     protected async Task StreamPostAsync()
     {
-        await foreach (var item in Api.StreamPostAsync(30))
-        {
-            StreamPost += item;
-            Logger.LogInformation($"POST: {item}");
-            StateHasChanged();
-        }
+        //await foreach (var item in Api.StreamPostAsync(30))
+        //{
+        //    StreamPost += item;
+        //    Logger.LogInformation($"POST: {item}");
+        //    StateHasChanged();
+        //}
     }
 }
