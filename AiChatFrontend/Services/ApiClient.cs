@@ -249,28 +249,6 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         return httpClient.PostAsAsyncEnumerable<StreamingChatResponse>($"{RAG_TEXT}/query-llm", req, ct);
     }
 
-    public async IAsyncEnumerable<string> StreamPostAsync(int max)
-    {
-        var httpClient = fac.CreateClient(NAME);
-        var results = httpClient.PostAsAsyncEnumerable<string>($"{RAG_TEXT}/stream-post", max, default);
-
-        await foreach (var r in results)
-        {
-            yield return r;
-        }
-    }
-
-    public async IAsyncEnumerable<string> StreamGetAsync(int max)
-    {
-        var httpClient = fac.CreateClient(NAME);
-        var results = httpClient.GetFromJsonAsAsyncEnumerable<string>($"{RAG_TEXT}/stream-get?max={max}", default);
-
-        await foreach (var r in results)
-        {
-            yield return r;
-        }
-    }
-
     #endregion
 
     #region rag/recipe
@@ -281,6 +259,7 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
         try
         {
             var httpClient = fac.CreateClient(NAME);
+            httpClient.Timeout = TimeSpan.FromSeconds(3);
             var response = await httpClient.GetAsync($"{RAG_RECIPE}/is-qdrant-running");
 
             if (response.IsSuccessStatusCode)
