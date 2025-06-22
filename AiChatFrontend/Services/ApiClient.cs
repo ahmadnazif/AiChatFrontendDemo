@@ -12,25 +12,6 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
     private readonly ILogger<ApiClient> logger = logger;
     private readonly IHttpClientFactory fac = fac;
 
-    #region Check Backend API
-    public async Task<bool> IsConnectedAsync()
-    {
-        try
-        {
-            var httpClient = fac.CreateClient(NAME);
-            httpClient.Timeout = TimeSpan.FromSeconds(3);
-            var response = await httpClient.GetAsync($"/swagger/index.html");
-
-            return response.IsSuccessStatusCode;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex.Message);
-            return false;
-        }
-    }
-    #endregion
-
     #region /hub-info
     public const string HUBINFO = "hub-info";
     public async Task<bool> IsUserRegisteredAsync(string username)
@@ -291,6 +272,22 @@ public class ApiClient(ILogger<ApiClient> logger, IHttpClientFactory fac)
 
     #region /app-info
     public const string APPINFO = "app-info";
+    public async Task<bool> IsConnectedAsync()
+    {
+        try
+        {
+            var httpClient = fac.CreateClient(NAME);
+            httpClient.Timeout = TimeSpan.FromSeconds(30);
+            var response = await httpClient.GetAsync($"{APPINFO}/ok");
+
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.Message);
+            return false;
+        }
+    }
     public async Task<object> GetAiRuntimeInfoAsync()
     {
         try
